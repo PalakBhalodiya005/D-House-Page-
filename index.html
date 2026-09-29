@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D'House Jewels - Luster Bracelet | The Class</title>
+  <meta name="description" content="A delicate blend of brilliance and grace. The Luster Bracelet is designed to add a subtle sparkle to your everyday, and a lasting shine to your special moments.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Montserrat:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <!-- Hamburger Menu -->
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Toggle Navigation Menu">
+        <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Brand Logo -->
+      <div class="brand-logo-wrap">
+        <a href="#" class="brand-title">D'House Jewels</a>
+        <div class="brand-sub">
+          <span class="sub-line"></span>
+          <span class="sub-text">THE CLASS</span>
+          <span class="sub-line"></span>
+        </div>
+      </div>
+
+      <!-- Action Icons -->
+      <div class="header-actions">
+        <button class="icon-btn" id="searchBtn" aria-label="Search">
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7.5"></circle>
+            <line x1="16.5" y1="16.5" x2="21.5" y2="21.5"></line>
+          </svg>
+        </button>
+
+        <button class="icon-btn wishlist-nav-btn" id="wishlistNavBtn" aria-label="Wishlist">
+          <svg class="heart-icon" viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </button>
+
+        <button class="icon-btn cart-btn" id="cartBtn" aria-label="Shopping Bag">
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Product Showcase -->
+  <main class="product-page">
+    <div class="product-container">
+      
+      <!-- LEFT COLUMN: Gallery & Value Badges -->
+      <section class="gallery-column">
+        <!-- Main Image Display Container -->
+        <div class="main-slider-card">
+          <img id="mainDisplayImg" class="main-product-image" src="images/wrist_silver.jpg" alt="Luster Bracelet on wrist">
+          
+          <!-- Top Right Overlay Action (Wishlist Heart) -->
+          <button class="image-action-btn" id="imageLikeBtn" aria-label="Save to Wishlist">
+            <svg class="heart-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+          </button>
+
+          <!-- Navigation Arrow Left -->
+          <button class="slider-arrow arrow-left" id="prevSlideBtn" aria-label="Previous image">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+
+          <!-- Navigation Arrow Right -->
+          <button class="slider-arrow arrow-right" id="nextSlideBtn" aria-label="Next image">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+
+          <!-- Slide Counter Badge -->
+          <div class="slide-indicator">
+            <span id="currentSlideNum">1</span>/<span id="totalSlidesNum">5</span>
+            <div class="indicator-bar"><div class="indicator-fill" id="indicatorFill"></div></div>
+          </div>
+        </div>
+
+        <!-- Thumbnails Row -->
+        <div class="thumbnail-strip" id="thumbnailStrip">
+          <button class="thumb-item active" data-index="0" aria-label="Thumbnail 1">
+            <img id="thumbImg0" src="images/wrist_silver.jpg" alt="Wrist wear view">
+          </button>
+          <button class="thumb-item" data-index="1" aria-label="Thumbnail 2">
+            <img id="thumbImg1" src="images/angled_silver.jpg" alt="Angled diamond detail view">
+          </button>
+          <button class="thumb-item" data-index="2" aria-label="Thumbnail 3">
+            <img id="thumbImg2" src="images/circle_silver.jpg" alt="Circular flat view">
+          </button>
+          <button class="thumb-item" data-index="3" aria-label="Thumbnail 4">
+            <img id="thumbImg3" src="images/thumb4.jpg" alt="Luxury jewelry box">
+          </button>
+          <button class="thumb-item" data-index="4" aria-label="Thumbnail 5">
+            <img id="thumbImg4" src="images/straight_silver.jpg" alt="Extended straight bracelet view">
+          </button>
+        </div>
+
+        <!-- Value Proposition Highlights -->
+        <div class="value-props-list">
+          <!-- Item 1 -->
+          <div class="value-prop-item">
+            <div class="value-icon">
+              <!-- Diamond outline icon -->
+              <svg viewBox="0 0 24 24" width="28" height="28" stroke="#3d1419" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 3h12l4 6-10 12L2 9z"></path>
+                <path d="M10 3L6 9l6 12 6-12-4-6"></path>
+                <path d="M2 9h20"></path>
+              </svg>
+            </div>
+            <div class="value-text">
+              <h4 class="prop-title">Premium Quality</h4>
+              <p class="prop-sub">Craftsmanship</p>
+            </div>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="value-prop-item">
+            <div class="value-icon">
+              <!-- Shield with checkmark -->
+              <svg viewBox="0 0 24 24" width="28" height="28" stroke="#3d1419" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <polyline points="9 12 11 14 15 10"></polyline>
+              </svg>
+            </div>
+            <div class="value-text">
+              <h4 class="prop-title">Hypoallergenic</h4>
+              <p class="prop-sub">&amp; Skin Friendly</p>
+            </div>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="value-prop-item">
+            <div class="value-icon">
+              <!-- Four-point sparkle icon -->
+              <svg viewBox="0 0 24 24" width="28" height="28" stroke="#3d1419" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2c0 5-4 9-9 9 5 0 9 4 9 9 0-5 4-9 9-9-5 0-9-4-9-9z"></path>
+              </svg>
+            </div>
+            <div class="value-text">
+              <h4 class="prop-title">Long Lasting Shine</h4>
+              <p class="prop-sub">&amp; Durability</p>
+            </div>
+          </div>
+
+          <!-- Item 4 -->
+          <div class="value-prop-item">
+            <div class="value-icon">
+              <!-- Elegant packaging gift box icon -->
+              <svg viewBox="0 0 24 24" width="28" height="28" stroke="#3d1419" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 12 20 22 4 22 4 12"></polyline>
+                <rect x="2" y="7" width="20" height="5"></rect>
+                <line x1="12" y1="22" x2="12" y2="7"></line>
+                <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+                <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+              </svg>
+            </div>
+            <div class="value-text">
+              <h4 class="prop-title">Elegant Packaging</h4>
+              <p class="prop-sub">Included</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Script Sentiment Quote -->
+        <div class="brand-sentiment">
+          <p class="script-quote">More than just a piece of jewellery</p>
+          <div class="sentiment-sub">
+            <span class="sentiment-line"></span>
+            <span class="sentiment-text">IT'S A FEELING</span>
+            <span class="sentiment-line"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: Product Information & Customizer -->
+      <section class="details-column">
+        <!-- Subtitle & Top Rule -->
+        <div class="collection-header">
+          <span class="collection-tag">TIMELESS ELEGANCE</span>
+          <div class="header-divider-line"></div>
+        </div>
+
+        <!-- Product Title -->
+        <h1 class="product-title">Luster Bracelet</h1>
+
+        <!-- Product Description -->
+        <p class="product-description">
+          A delicate blend of brilliance and grace. The Luster Bracelet is designed to add a subtle sparkle to your everyday, and a lasting shine to your special moments.
+        </p>
+
+        <!-- Pricing Block -->
+        <div class="price-section">
+          <div class="price-row">
+            <span class="currency-symbol">₹</span>
+            <span class="main-price" id="priceDisplay">48,500</span>
+            <span class="approx-tag">(Approx. price)</span>
+          </div>
+          <p class="price-disclaimer">
+            Final price will be calculated based on your selected metal, diamond, color and certificate option.
+          </p>
+        </div>
+
+        <!-- SECTION 1: Metal Selection -->
+        <div class="option-group" id="metalGroup">
+          <div class="option-header">
+            <div class="option-header-icon">
+              <!-- Ingot/Bullion stack icon -->
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="#3d1419" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 10h12l3 4H7l-3-4z"></path>
+                <path d="M7 6h12l3 4H10L7 6z"></path>
+                <path d="M1 14h12l3 4H4l-3-4z"></path>
+              </svg>
+            </div>
+            <div class="option-header-title">
+              <h3>Metal Selection</h3>
+              <p>Choose your preferred metal</p>
+            </div>
+          </div>
+
+          <div class="metal-selection-wrapper">
+            <!-- Metal Spheres Grid (Selectable) -->
+            <div class="cards-grid grid-4-cols" id="metalSpheresGrid">
+              <!-- Silver -->
+              <button class="choice-card sphere-card-silver active" data-type="metal" data-value="Silver" data-purity="92.5%" data-price="48500" aria-selected="true">
+                <span class="radio-indicator"></span>
+                <div class="sphere-icon sphere-silver"></div>
+                <span class="card-title">Silver</span>
+                <div class="card-detail">
+                  <span>92.5% Pure Silver</span>
+                  <span>+ 7.5% Other Metals</span>
+                </div>
+              </button>
+
+              <!-- 9K Gold -->
+              <button class="choice-card sphere-card-9k" data-type="metal" data-value="9K Gold" data-purity="40%" data-price="78500" aria-selected="false">
+                <span class="radio-indicator"></span>
+                <div class="sphere-icon sphere-gold-9k"></div>
+                <span class="card-title">9K Gold</span>
+                <div class="card-detail">
+                  <span>40% Pure Gold</span>
+                  <span>+ 60% Other Metals</span>
+                </div>
+              </button>
+
+              <!-- 14K Gold -->
+              <button class="choice-card sphere-card-14k" data-type="metal" data-value="14K Gold" data-purity="59%" data-price="112000" aria-selected="false">
+                <span class="radio-indicator"></span>
+                <div class="sphere-icon sphere-gold-14k"></div>
+                <span class="card-title">14K Gold</span>
+                <div class="card-detail">
+                  <span>59% Pure Gold</span>
+                  <span>+ 41% Other Metals</span>
+                </div>
+              </button>
+
+              <!-- 18K Gold -->
+              <button class="choice-card sphere-card-18k" data-type="metal" data-value="18K Gold" data-purity="76%" data-price="145000" aria-selected="false">
+                <span class="radio-indicator"></span>
+                <div class="sphere-icon sphere-gold-18k"></div>
+                <span class="card-title">18K Gold</span>
+                <div class="card-detail">
+                  <span>76% Pure Gold</span>
+                  <span>+ 24% Other Metals</span>
+                </div>
+              </button>
+            </div>
+
+            <!-- Metal Ingot Visual Row (Exact layout from screenshot) -->
+            <div class="cards-grid grid-4-cols metal-bars-row" id="metalBarsGrid">
+              <!-- Silver Ingot -->
+              <button type="button" class="ingot-card ingot-card-silver active" data-metal="Silver" aria-label="Silver Ingot">
+                <span class="ingot-name">Silver</span>
+                <div class="ingot-img-wrap">
+                  <img src="images/bar_silver.jpg" alt="Silver Bar Ingot">
+                </div>
+                <div class="ingot-detail">
+                  <span>92.5% Pure Silver</span>
+                  <span>7.5% Other Metals</span>
+                </div>
+              </button>
+
+              <!-- 9K Gold Ingot -->
+              <button type="button" class="ingot-card ingot-card-9k" data-metal="9K Gold" aria-label="9K Gold Ingot">
+                <span class="ingot-name">9K Gold</span>
+                <div class="ingot-img-wrap">
+                  <img src="images/bar_9k.jpg" alt="9K Gold Bar Ingot">
+                </div>
+                <div class="ingot-detail">
+                  <span>40% Pure Gold</span>
+                  <span>60% Other Metals</span>
+                </div>
+              </button>
+
+              <!-- 14K Gold Ingot -->
+              <button type="button" class="ingot-card ingot-card-14k" data-metal="14K Gold" aria-label="14K Gold Ingot">
+                <span class="ingot-name">14K Gold</span>
+                <div class="ingot-img-wrap">
+                  <img src="images/bar_14k.jpg" alt="14K Gold Bar Ingot">
+                </div>
+                <div class="ingot-detail">
+                  <span>59% Pure Gold</span>
+                  <span>41% Other Metals</span>
+                </div>
+              </button>
+
+              <!-- 18K Gold Ingot -->
+              <button type="button" class="ingot-card ingot-card-18k" data-metal="18K Gold" aria-label="18K Gold Ingot">
+                <span class="ingot-name">18K Gold</span>
+                <div class="ingot-img-wrap">
+                  <img src="images/bar_18k.jpg" alt="18K Gold Bar Ingot">
+                </div>
+                <div class="ingot-detail">
+                  <span>76% Pure Gold</span>
+                  <span>24% Other Metals</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: Diamond Selection -->
+        <div class="option-group" id="diamondGroup">
+          <div class="option-header">
+            <div class="option-header-icon">
+              <!-- Diamond outline icon -->
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="#3d1419" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="6 3 18 3 22 9 12 22 2 9 6 3"></polygon>
+                <line x1="2" y1="9" x2="22" y2="9"></line>
+              </svg>
+            </div>
+            <div class="option-header-title">
+              <h3>Diamond Selection</h3>
+              <p>Choose your preferred diamond type</p>
+            </div>
+          </div>
+
+          <div class="cards-grid grid-3-cols" id="diamondGrid">
+            <!-- Moissanite -->
+            <button class="choice-card active" data-type="diamond" data-value="Moissanite" data-addprice="0" aria-selected="true">
+              <span class="radio-indicator"></span>
+              <div class="diamond-graphic">
+                <!-- 8-point sparkling star -->
+                <svg viewBox="0 0 36 36" width="30" height="30" stroke="#4a3b32" stroke-width="1.5" fill="none" stroke-linecap="round">
+                  <path d="M18 2v32M2 18h32M6.7 6.7l22.6 22.6M6.7 29.3L29.3 6.7"></path>
+                  <circle cx="18" cy="18" r="4.5" stroke="#4a3b32" stroke-width="1.2"></circle>
+                </svg>
+              </div>
+              <span class="card-title">Moissanite</span>
+              <div class="card-detail">
+                <span>Brilliant shine,</span>
+                <span>great value</span>
+              </div>
+            </button>
+
+            <!-- CVD -->
+            <button class="choice-card" data-type="diamond" data-value="CVD" data-addprice="22000" aria-selected="false">
+              <span class="radio-indicator"></span>
+              <div class="diamond-graphic">
+                <!-- Round brilliant top facet diagram -->
+                <svg viewBox="0 0 36 36" width="30" height="30" stroke="#4a3b32" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="18" cy="18" r="14"></circle>
+                  <polygon points="18,6 27,10 27,26 18,30 9,26 9,10"></polygon>
+                  <circle cx="18" cy="18" r="5"></circle>
+                  <line x1="18" y1="4" x2="18" y2="13"></line>
+                  <line x1="18" y1="23" x2="18" y2="32"></line>
+                  <line x1="4" y1="18" x2="13" y2="18"></line>
+                  <line x1="23" y1="18" x2="32" y2="18"></line>
+                </svg>
+              </div>
+              <span class="card-title">CVD</span>
+              <div class="card-detail">
+                <span>Lab grown,</span>
+                <span>identical brilliance</span>
+              </div>
+            </button>
+
+            <!-- Natural -->
+            <button class="choice-card" data-type="diamond" data-value="Natural" data-addprice="85000" aria-selected="false">
+              <span class="radio-indicator"></span>
+              <div class="diamond-graphic">
+                <!-- Classic natural cut diamond icon -->
+                <svg viewBox="0 0 36 36" width="30" height="30" stroke="#4a3b32" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="9 6 27 6 33 15 18 31 3 15 9 6"></polygon>
+                  <line x1="3" y1="15" x2="33" y2="15"></line>
+                  <line x1="9" y1="6" x2="18" y2="31"></line>
+                  <line x1="27" y1="6" x2="18" y2="31"></line>
+                  <line x1="13.5" y1="6" x2="18" y2="15"></line>
+                  <line x1="22.5" y1="6" x2="18" y2="15"></line>
+                </svg>
+              </div>
+              <span class="card-title">Natural</span>
+              <div class="card-detail">
+                <span>Rare, authentic,</span>
+                <span>timeless</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- SECTION 3: Diamond Size -->
+        <div class="option-group" id="sizeGroup">
+          <div class="option-header">
+            <div class="option-header-icon">
+              <!-- Caliper / Gauge / Circle icon -->
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="#3d1419" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"></circle>
+                <polyline points="12 7 12 12 15 14"></polyline>
+              </svg>
+            </div>
+            <div class="option-header-title">
+              <h3>Diamond Size</h3>
+              <p>Select the diamond size you prefer</p>
+            </div>
+          </div>
+
+          <div class="cards-grid grid-3-cols" id="sizeGrid">
+            <!-- 2 mm -->
+            <button class="choice-card size-card" data-type="size" data-value="2 mm" data-addprice="-8000" aria-selected="false">
+              <span class="radio-indicator"></span>
+              <div class="size-graphic size-2mm">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#4a3b32" stroke-width="1.4" fill="none">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <polygon points="12,5 17,8 17,16 12,19 7,16 7,8"></polygon>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </div>
+              <span class="size-title">2 mm</span>
+            </button>
+
+            <!-- 3 mm -->
+            <button class="choice-card size-card active" data-type="size" data-value="3 mm" data-addprice="0" aria-selected="true">
+              <span class="radio-indicator"></span>
+              <div class="size-graphic size-3mm">
+                <svg viewBox="0 0 24 24" width="22" height="22" stroke="#4a3b32" stroke-width="1.4" fill="none">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <polygon points="12,5 17,8 17,16 12,19 7,16 7,8"></polygon>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </div>
+              <span class="size-title">3 mm</span>
+            </button>
+
+            <!-- 4 mm -->
+            <button class="choice-card size-card" data-type="size" data-value="4 mm" data-addprice="18500" aria-selected="false">
+              <span class="radio-indicator"></span>
+              <div class="size-graphic size-4mm">
+                <svg viewBox="0 0 24 24" width="26" height="26" stroke="#4a3b32" stroke-width="1.4" fill="none">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <polygon points="12,5 17,8 17,16 12,19 7,16 7,8"></polygon>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </div>
+              <span class="size-title">4 mm</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SECTION 4: Color Selection -->
+        <div class="option-group" id="colorGroup">
+          <div class="option-header">
+            <div class="option-header-icon">
+              <!-- Artist Palette Icon -->
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="#3d1419" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="13.5" cy="6.5" r=".5" fill="#3d1419"></circle>
+                <circle cx="17.5" cy="10.5" r=".5" fill="#3d1419"></circle>
+                <circle cx="8.5" cy="7.5" r=".5" fill="#3d1419"></circle>
+                <circle cx="6.5" cy="12.5" r=".5" fill="#3d1419"></circle>
+                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.992 6.512 17.48 2 12 2z"></path>
+              </svg>
+            </div>
+            <div class="option-header-title">
+              <h3>Color Selection</h3>
+              <p>Choose your preferred color</p>
+            </div>
+          </div>
+
+          <div class="cards-grid grid-4-cols" id="colorGrid">
+            <!-- White -->
+            <button class="choice-card color-card active" data-type="color" data-value="White" aria-selected="true">
+              <span class="radio-indicator"></span>
+              <div class="sphere-icon sphere-silver"></div>
+              <span class="color-title">White</span>
+            </button>
+
+            <!-- Yellow Gold -->
+            <button class="choice-card color-card" data-type="color" data-value="Yellow Gold" aria-selected="false">
+              <span class="radio-indicator"></span>
+              <div class="sphere-icon sphere-gold-yellow"></div>
+              <span class="color-title">Yellow Gold</span>
+            </button>
+
+            <!-- Light Rose Gold -->
+            <button class="choice-card color-card" data-type="color" data-value="Light Rose Gold" aria-selected="false">
+              <span class="radio-indicator"></span>
+              <div class="sphere-icon sphere-gold-14k"></div>
+              <span class="color-title">Light Rose Gold</span>
+            </button>
+
+            <!-- Dark Rose Gold -->
+            <button class="choice-card color-card" data-type="color" data-value="Dark Rose Gold" aria-selected="false">
+              <span class="radio-indicator"></span>
+              <div class="sphere-icon sphere-gold-18k"></div>
+              <span class="color-title">Dark Rose Gold</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SECTION 5: Certificate Selection -->
+        <div class="option-group" id="certGroup">
+          <div class="option-header">
+            <div class="option-header-icon">
+              <!-- Certificate document with ribbon seal -->
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="#3d1419" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <circle cx="10" cy="14" r="2.5"></circle>
+                <path d="M12 16.5l2 3.5-2.5-1-2.5 1 1-3.5"></path>
+              </svg>
+            </div>
+            <div class="option-header-title">
+              <h3>Certificate Selection</h3>
+              <p>Choose your preferred certificate</p>
+            </div>
+          </div>
+
+          <div class="cards-grid grid-3-cols" id="certGrid">
+            <!-- HRD Antwerp -->
+            <button class="choice-card cert-card active" data-type="certificate" data-value="HRD" data-certname="HRD Antwerp" aria-selected="true">
+              <span class="radio-indicator"></span>
+              <div class="cert-logo-container">
+                <span class="hrd-star">✦</span>
+                <span class="hrd-brand">HRD Antwerp</span>
+              </div>
+              <span class="cert-label">HRD Antwerp</span>
+            </button>
+
+            <!-- SGL -->
+            <button class="choice-card cert-card" data-type="certificate" data-value="SGL" data-certname="SGL" aria-selected="false">
+              <span class="radio-indicator"></span>
+              <div class="cert-logo-container">
+                <svg class="sgl-crest" viewBox="0 0 40 40" width="22" height="22" stroke="#77685d" stroke-width="1.5" fill="none">
+                  <circle cx="20" cy="20" r="16"></circle>
+                  <circle cx="20" cy="20" r="11" stroke-dasharray="2 2"></circle>
+                  <polygon points="20,13 24,18 20,23 16,18"></polygon>
+                </svg>
+                <span class="sgl-text">SGL</span>
+              </div>
+              <span class="cert-label">SGL</span>
+            </button>
+
+            <!-- IGI -->
+            <button class="choice-card cert-card" data-type="certificate" data-value="IGI" data-certname="IGI" aria-selected="false">
+              <span class="radio-indicator"></span>
+              <div class="cert-logo-container">
+                <svg class="igi-crest" viewBox="0 0 40 40" width="24" height="24" stroke="#77685d" stroke-width="1.5" fill="none">
+                  <circle cx="20" cy="20" r="16"></circle>
+                  <path d="M12 24c2-5 3-9 8-9s6 4 8 9"></path>
+                  <circle cx="20" cy="12" r="2.5"></circle>
+                </svg>
+                <span class="igi-text">IGI</span>
+              </div>
+              <span class="cert-label">IGI</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sticky / Inline Configuration Summary Pill -->
+        <div class="selected-spec-pill" id="selectedSpecPill">
+          <div class="spec-thumb">
+            <img id="specThumbImg" src="images/circle_silver.jpg" alt="Selected Luster Bracelet Configuration">
+          </div>
+          <div class="spec-info">
+            <h4 class="spec-title">Luster Bracelet</h4>
+            <p class="spec-summary" id="specSummaryText">
+              Metal: Silver (92.5%) &nbsp;|&nbsp; Color: White &nbsp;|&nbsp; Diamond: Moissanite &nbsp;|&nbsp; Size: 3 mm &nbsp;|&nbsp; Certificate: HRD
+            </p>
+          </div>
+        </div>
+
+        <!-- Action Call-To-Action Buttons -->
+        <div class="cta-actions">
+          <!-- Add to Cart Button -->
+          <button class="primary-btn add-to-cart-btn" id="addToCartBtn">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            <span>Add to Cart</span>
+            <span class="btn-arrow">&rarr;</span>
+          </button>
+
+          <!-- Chat on WhatsApp Button -->
+          <button class="secondary-btn whatsapp-btn" id="whatsappBtn">
+            <!-- WhatsApp Icon -->
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="#25D366">
+              <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm5.8 14.17c-.24.68-1.2 1.34-1.89 1.48-.48.1-1.09.18-3.17-.68-2.67-1.1-4.41-3.79-4.54-3.97-.13-.18-1.08-1.44-1.08-2.75 0-1.31.69-1.95.93-2.22.25-.26.54-.33.72-.33.19 0 .37 0 .53.01.17.01.4.06.63.54.23.49.8 1.95.87 2.1.07.14.11.31.02.5-.09.18-.13.3-.27.46-.13.16-.28.36-.4.49-.13.14-.27.29-.12.56.16.27.7 1.15 1.5 1.86 1.03.92 1.9 1.2 2.17 1.34.27.13.43.11.59-.07.16-.18.69-.8.87-1.08.19-.27.37-.23.63-.13.26.09 1.63.77 1.91.91.28.14.47.21.54.33.07.11.07.66-.17 1.34z"></path>
+            </svg>
+            <span>Chat on WhatsApp</span>
+          </button>
+        </div>
+
+      </section>
+    </div>
+
+    <!-- Bottom Feature Trust Badges Strip -->
+    <footer class="trust-footer-strip">
+      <div class="trust-badge-item">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="#4a372f" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Home Preview Available</span>
+      </div>
+
+      <div class="trust-badge-item">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="#4a372f" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="3" width="15" height="13"></rect>
+          <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+          <circle cx="5.5" cy="18.5" r="2.5"></circle>
+          <circle cx="18.5" cy="18.5" r="2.5"></circle>
+        </svg>
+        <span>Same Day Delivery</span>
+      </div>
+
+      <div class="trust-badge-item">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="#4a372f" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <polyline points="9 12 11 14 15 10"></polyline>
+        </svg>
+        <span>Secure &amp; Easy Checkout</span>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Notification Toast -->
+  <div class="toast-notification" id="toastNotification">
+    <div class="toast-content">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="#25d366" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span id="toastMessage">Item added to your shopping bag!</span>
+    </div>
+  </div>
+
+  <!-- JavaScript File -->
+  <script src="script.js"></script>
+</body>
+</html>
