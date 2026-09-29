@@ -388,10 +388,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Chat on WhatsApp with pre-filled message
   if (whatsappBtn) {
     whatsappBtn.addEventListener('click', () => {
+      const phoneNumber = '919898948986';
       const text = encodeURIComponent(
         `Hi D'House Jewels! I would like to inquire about the Luster Bracelet:\n- Metal: ${currentConfig.metal.name} (${currentConfig.metal.purity})\n- Color: ${currentConfig.color.name}\n- Diamond: ${currentConfig.diamond.type}\n- Size: ${currentConfig.size.value}\n- Certificate: ${currentConfig.certificate.code}\n- Price: ₹${priceDisplay ? priceDisplay.textContent : '48,500'}`
       );
-      window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+      window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${text}`, '_blank');
     });
   }
 
