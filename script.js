@@ -346,18 +346,59 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 3200);
   }
 
-  // Add to Cart Interaction
+  // Helper to save current configuration & directly open checkout page
+  function saveAndDirectCheckout() {
+    const totalPrice =
+      currentConfig.metal.basePrice +
+      currentConfig.diamond.addPrice +
+      currentConfig.size.addPrice;
+
+    let selectedImg = metalConfigThumbs[currentMetal] || 'images/circle_silver.jpg';
+    if (galleryImages && galleryImages.length > 0 && galleryImages[currentSlideIndex]) {
+      selectedImg = galleryImages[currentSlideIndex];
+    }
+
+    const checkoutItem = {
+      title: 'Luster Bracelet',
+      metal: currentConfig.metal.name,
+      purity: currentConfig.metal.purity,
+      color: currentConfig.color.name,
+      diamond: currentConfig.diamond.type,
+      size: currentConfig.size.value,
+      certificate: currentConfig.certificate.code,
+      certificateName: currentConfig.certificate.name,
+      price: totalPrice,
+      image: selectedImg,
+      quantity: 1
+    };
+
+    try {
+      localStorage.setItem('dhouse_checkout_item', JSON.stringify(checkoutItem));
+    } catch (e) {
+      console.warn('Could not save checkout item to localStorage', e);
+    }
+
+    // Direct redirect to checkout page
+    window.location.href = 'checkout.html';
+  }
+
+  // Add to Cart Interaction - directly opens checkout page
   if (addToCartBtn) {
     addToCartBtn.addEventListener('click', () => {
       cartCount++;
       if (cartBadge) {
         cartBadge.textContent = cartCount;
         cartBadge.style.transform = 'scale(1.35)';
-        setTimeout(() => {
-          cartBadge.style.transform = 'scale(1)';
-        }, 200);
       }
-      showToast(`Added to bag: Luster Bracelet (${currentConfig.metal.name}, ${currentConfig.diamond.type})`);
+      saveAndDirectCheckout();
+    });
+  }
+
+  // Header Cart Icon Navigation
+  const cartBtn = document.getElementById('cartBtn');
+  if (cartBtn) {
+    cartBtn.addEventListener('click', () => {
+      saveAndDirectCheckout();
     });
   }
 
@@ -388,11 +429,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Chat on WhatsApp with pre-filled message
   if (whatsappBtn) {
     whatsappBtn.addEventListener('click', () => {
-      const phoneNumber = '919898948986';
+      const savedWa = localStorage.getItem('dhouse_whatsapp_number');
+      const phoneNumber = (savedWa && savedWa.trim()) ? savedWa.trim().replace(/[^0-9]/g, '') : '919898948986';
       const text = encodeURIComponent(
         `Hi D'House Jewels! I would like to inquire about the Luster Bracelet:\n- Metal: ${currentConfig.metal.name} (${currentConfig.metal.purity})\n- Color: ${currentConfig.color.name}\n- Diamond: ${currentConfig.diamond.type}\n- Size: ${currentConfig.size.value}\n- Certificate: ${currentConfig.certificate.code}\n- Price: ₹${priceDisplay ? priceDisplay.textContent : '48,500'}`
       );
-      window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${text}`, '_blank');
+      window.open(`https://api.whatsapp.com/send?phone=${phoneNumber || '919898948986'}&text=${text}`, '_blank');
     });
   }
 
