@@ -13,7 +13,41 @@
   
   <!-- Stylesheet -->
   <link rel="stylesheet" href="style.css">
-</head>
+<style>@media (max-width: 580px) {
+    .product-features-row {
+      display: grid !important;
+      grid-template-columns: max-content max-content !important;
+      justify-content: center !important;
+      column-gap: 20px !important;
+      row-gap: 12px !important;
+      padding: 12px 14px !important;
+      box-sizing: border-box !important;
+    }
+    .product-features-row .product-feature-item {
+      display: flex !important;
+      align-items: center !important;
+      gap: 7px !important;
+    }
+    .product-features-row .feature-icon-wrap {
+      width: 20px !important;
+      height: 20px !important;
+      flex-shrink: 0 !important;
+    }
+    .product-features-row .feature-icon-wrap svg {
+      width: 18px !important;
+      height: 18px !important;
+    }
+    .product-features-row .feature-title {
+      font-size: 10px !important;
+      line-height: 1.2 !important;
+      white-space: nowrap !important;
+    }
+    .product-features-row .feature-sub {
+      font-size: 9px !important;
+      line-height: 1.2 !important;
+      white-space: nowrap !important;
+    }
+    }</style></head>
 <body>
 
   <!-- Top Navigation Header -->
@@ -466,7 +500,8 @@
             <button class="choice-card cert-card active" data-type="certificate" data-value="HRD" data-certname="HRD Antwerp" aria-selected="true">
               <span class="radio-indicator"></span>
               <div class="cert-logo-container">
-                <img src="images/hrd.png" class="cert-logo-img hrd-logo-img" alt="HRD Antwerp Logo">
+                <span class="hrd-star">✦</span>
+                <span class="hrd-brand">HRD Antwerp</span>
               </div>
             </button>
 
@@ -474,7 +509,12 @@
             <button class="choice-card cert-card" data-type="certificate" data-value="SGL" data-certname="SGL" aria-selected="false">
               <span class="radio-indicator"></span>
               <div class="cert-logo-container">
-                <img src="images/sgl.png" class="cert-logo-img sgl-logo-img" alt="SGL Logo">
+                <svg class="sgl-crest" viewBox="0 0 40 40" width="22" height="22" stroke="#77685d" stroke-width="1.5" fill="none">
+                  <circle cx="20" cy="20" r="16"></circle>
+                  <circle cx="20" cy="20" r="11" stroke-dasharray="2 2"></circle>
+                  <polygon points="20,13 24,18 20,23 16,18"></polygon>
+                </svg>
+                <span class="sgl-text">SGL</span>
               </div>
             </button>
 
@@ -482,7 +522,11 @@
             <button class="choice-card cert-card" data-type="certificate" data-value="IGI" data-certname="IGI" aria-selected="false">
               <span class="radio-indicator"></span>
               <div class="cert-logo-container">
-                <img src="images/igi.webp" class="cert-logo-img" alt="IGI Logo">
+                <svg class="igi-crest" viewBox="0 0 40 40" width="24" height="24" stroke="#77685d" stroke-width="1.5" fill="none">
+                  <circle cx="20" cy="20" r="16"></circle>
+                  <path d="M12 24c2-5 3-9 8-9s6 4 8 9"></path>
+                  <circle cx="20" cy="12" r="2.5"></circle>
+                </svg>
               </div>
             </button>
           </div>
@@ -490,7 +534,7 @@
 
         <!-- Product Trust & Assurance Features (After Certificate Selection) -->
         <div class="product-features-row">
-          <!-- Feature 1: Premium Quality Craftsmanship -->
+          <!-- Feature 1: Premium Quality Craftsmanship (Requested) -->
           <div class="product-feature-item">
             <div class="feature-icon-wrap">
               <svg viewBox="0 0 24 24" width="28" height="28" stroke="#9E0911" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -505,7 +549,24 @@
             </div>
           </div>
 
-          <!-- Feature 2: Certified Authenticity -->
+          <!-- Feature 2: Elegant Packaging Included (Requested) -->
+          <div class="product-feature-item">
+            <div class="feature-icon-wrap">
+              <svg viewBox="0 0 24 24" width="28" height="28" stroke="#9E0911" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 12 20 22 4 22 4 12"></polyline>
+                <rect x="2" y="7" width="20" height="5"></rect>
+                <line x1="12" y1="22" x2="12" y2="7"></line>
+                <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+                <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+              </svg>
+            </div>
+            <div class="feature-text-wrap">
+              <span class="feature-title">Elegant Packaging</span>
+              <span class="feature-sub">Included</span>
+            </div>
+          </div>
+
+          <!-- Feature 3: Certified Authenticity 100% Guaranteed -->
           <div class="product-feature-item">
             <div class="feature-icon-wrap">
               <svg viewBox="0 0 24 24" width="28" height="28" stroke="#9E0911" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -520,20 +581,17 @@
             </div>
           </div>
 
-          <!-- Feature 3: Elegant Packaging -->
+          <!-- Feature 4: Hallmarked Purity (Gold & Silver) -->
           <div class="product-feature-item">
             <div class="feature-icon-wrap">
               <svg viewBox="0 0 24 24" width="28" height="28" stroke="#9E0911" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 12 20 22 4 22 4 12"></polyline>
-                <rect x="2" y="7" width="20" height="5"></rect>
-                <line x1="12" y1="22" x2="12" y2="7"></line>
-                <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
-                <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+                <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"></polygon>
+                <circle cx="12" cy="12" r="3.5"></circle>
               </svg>
             </div>
             <div class="feature-text-wrap">
-              <span class="feature-title">Elegant Packaging</span>
-              <span class="feature-sub">Included</span>
+              <span class="feature-title">Hallmarked Purity</span>
+              <span class="feature-sub">Pure Gold &amp; Silver</span>
             </div>
           </div>
         </div>

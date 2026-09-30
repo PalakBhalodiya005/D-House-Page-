@@ -168,6 +168,9 @@ document.addEventListener('DOMContentLoaded', () => {
       purity: '92.5%',
       basePrice: 48500
     },
+    braceletSize: {
+      value: '7” (17.8 cm)'
+    },
     diamond: {
       type: 'Moissanite',
       addPrice: 0
@@ -203,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (specSummaryText) {
-      specSummaryText.innerHTML = `Metal: ${currentConfig.metal.name} (${currentConfig.metal.purity}) &nbsp;|&nbsp; Color: ${currentConfig.color.name} &nbsp;|&nbsp; Diamond: ${currentConfig.diamond.type} &nbsp;|&nbsp; Size: ${currentConfig.size.value} &nbsp;|&nbsp; Certificate: ${currentConfig.certificate.code}`;
+      specSummaryText.innerHTML = `Metal: ${currentConfig.metal.name} (${currentConfig.metal.purity}) &nbsp;|&nbsp; Bracelet Size: ${currentConfig.braceletSize.value} &nbsp;|&nbsp; Color: ${currentConfig.color.name} &nbsp;|&nbsp; Diamond: ${currentConfig.diamond.type} &nbsp;|&nbsp; Diamond Size: ${currentConfig.size.value} &nbsp;|&nbsp; Certificate: ${currentConfig.certificate.code}`;
     }
   }
 
@@ -231,7 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // 4. Synchronized Metal & Color Selection
   // ---------------------------------------------------------------------------
   const metalSpheres = document.querySelectorAll('#metalSpheresGrid .choice-card');
-  const metalBars = document.querySelectorAll('#metalBarsGrid .ingot-card');
   const colorCards = document.querySelectorAll('#colorGrid .choice-card');
 
   function selectMetal(metalName, syncColor = true) {
@@ -247,13 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // 2. Update ingot cards
-    metalBars.forEach((bar) => {
-      const isMatch = bar.getAttribute('data-metal') === metalName;
-      bar.classList.toggle('active', isMatch);
-    });
-
-    // 3. Sync color selection
+    // 2. Sync color selection
     if (syncColor && metalToColorMap[metalName]) {
       const targetColor = metalToColorMap[metalName];
       currentConfig.color.name = targetColor;
@@ -264,10 +260,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // 4. Update Gallery Images for this Metal!
+    // 3. Update Gallery Images for this Metal!
     updateMetalGallery(metalName);
 
-    // 5. Re-render price & specs
+    // 4. Re-render price & specs
     renderConfig();
   }
 
@@ -275,13 +271,6 @@ document.addEventListener('DOMContentLoaded', () => {
   metalSpheres.forEach((card) => {
     card.addEventListener('click', () => {
       selectMetal(card.getAttribute('data-value'));
-    });
-  });
-
-  // Click listeners for metal ingot cards
-  metalBars.forEach((bar) => {
-    bar.addEventListener('click', () => {
-      selectMetal(bar.getAttribute('data-metal'));
     });
   });
 
@@ -305,6 +294,11 @@ document.addEventListener('DOMContentLoaded', () => {
         renderConfig();
       }
     });
+  });
+
+  // Bracelet Size Selection Handler
+  setupSelectionGroup('#braceletSizeGrid', (card) => {
+    currentConfig.braceletSize.value = card.getAttribute('data-value');
   });
 
   // Diamond Type Selection Handler
@@ -357,19 +351,16 @@ document.addEventListener('DOMContentLoaded', () => {
           cartBadge.style.transform = 'scale(1)';
         }, 200);
       }
-      showToast(`Added to bag: Luster Bracelet (${currentConfig.metal.name}, ${currentConfig.diamond.type})`);
+      showToast(`Added to bag: Luster Bracelet (${currentConfig.metal.name}, Size: ${currentConfig.braceletSize.value}, ${currentConfig.diamond.type})`);
     });
   }
 
-  // Wishlist Toggle (Synchronized between Navbar and Hero Image button)
+  // Wishlist Toggle (Hero Image button & Navbar if present)
   function toggleWishlist() {
-    let isLiked = false;
+    if (!imageLikeBtn) return;
+    const isLiked = imageLikeBtn.classList.toggle('liked');
     if (wishlistNavBtn) {
-      wishlistNavBtn.classList.toggle('liked');
-      isLiked = wishlistNavBtn.classList.contains('liked');
-    }
-    if (imageLikeBtn) {
-      imageLikeBtn.classList.toggle('liked', isLiked);
+      wishlistNavBtn.classList.toggle('liked', isLiked);
     }
     showToast(isLiked ? 'Added to your Wishlist' : 'Removed from Wishlist');
   }
@@ -390,7 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
     whatsappBtn.addEventListener('click', () => {
       const phoneNumber = '919898948986';
       const text = encodeURIComponent(
-        `Hi D'House Jewels! I would like to inquire about the Luster Bracelet:\n- Metal: ${currentConfig.metal.name} (${currentConfig.metal.purity})\n- Color: ${currentConfig.color.name}\n- Diamond: ${currentConfig.diamond.type}\n- Size: ${currentConfig.size.value}\n- Certificate: ${currentConfig.certificate.code}\n- Price: ₹${priceDisplay ? priceDisplay.textContent : '48,500'}`
+        `Hi D'House Jewels! I would like to inquire about the Luster Bracelet:\n- Metal: ${currentConfig.metal.name} (${currentConfig.metal.purity})\n- Bracelet Size: ${currentConfig.braceletSize.value}\n- Color: ${currentConfig.color.name}\n- Diamond: ${currentConfig.diamond.type}\n- Diamond Size: ${currentConfig.size.value}\n- Certificate: ${currentConfig.certificate.code}\n- Price: ₹${priceDisplay ? priceDisplay.textContent : '48,500'}`
       );
       window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${text}`, '_blank');
     });
