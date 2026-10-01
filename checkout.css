@@ -3,36 +3,99 @@
    Seamless, responsive, high-converting luxury e-commerce experience
    ========================================================================== */
 
+/* Primary Brand & Typography - XB Niloofar (XBnilofar) */
+@font-face {
+  font-family: 'XB Niloofar';
+  src: local('XB Niloofar'), local('XBnilofar'), local('XBNiloofar'),
+       url('fonts/XBNiloofar.woff') format('woff'),
+       url('fonts/XBNiloofar.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'XBnilofar';
+  src: local('XB Niloofar'), local('XBnilofar'), local('XBNiloofar'),
+       url('fonts/XBNiloofar.woff') format('woff'),
+       url('fonts/XBNiloofar.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'XB Niloofar';
+  src: local('XB Niloofar Bold'), local('XBnilofar Bold'), local('XBNiloofarBd'),
+       url('fonts/XBNiloofarBd.woff') format('woff'),
+       url('fonts/XBNiloofarBd.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'XBnilofar';
+  src: local('XB Niloofar Bold'), local('XBnilofar Bold'), local('XBNiloofarBd'),
+       url('fonts/XBNiloofarBd.woff') format('woff'),
+       url('fonts/XBNiloofarBd.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'XB Niloofar';
+  src: local('XB Niloofar Italic'), local('XBnilofar Italic'), local('XBNiloofarIt'),
+       url('fonts/XBNiloofarIt.woff') format('woff'),
+       url('fonts/XBNiloofarIt.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'XBnilofar';
+  src: local('XB Niloofar Italic'), local('XBnilofar Italic'), local('XBNiloofarIt'),
+       url('fonts/XBNiloofarIt.woff') format('woff'),
+       url('fonts/XBNiloofarIt.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   --bg-parchment: #faf6f0;
   --bg-card: #ffffff;
-  --bg-card-soft: #fcfbf9;
-  --bg-header: #350e13;
-  --bg-header-accent: #28080c;
+  --bg-card-soft: #ffffff;
+  --bg-header: #9E0911;
+  --bg-header-accent: #82070e;
   
-  --primary-burgundy: #380e14;
-  --primary-burgundy-hover: #24060b;
+  --primary-color: #9E0911;
+  --primary-burgundy: #9E0911;
+  --primary-burgundy-hover: #7f070e;
   --gold-accent: #c5a059;
   --gold-soft: #fbf7ee;
   --gold-border: #dfcca0;
 
   --border-light: #e8e0d5;
-  --border-active: #380e14;
-  --border-focus: #7a232e;
+  --border-active: #9E0911;
+  --border-focus: #9E0911;
 
   --text-primary: #221714;
-  --text-heading: #26070b;
+  --text-heading: #1e0204;
   --text-muted: #6e5f56;
   --text-subtle: #8e8076;
   --success-green: #2e7d32;
 
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans: 'Outfit', 'Montserrat', sans-serif;
+  --font-primary: 'XB Niloofar', 'XBnilofar', 'Outfit', 'Montserrat', sans-serif;
+  --font-serif: 'XB Niloofar', 'XBnilofar', 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'XB Niloofar', 'XBnilofar', 'Outfit', 'Montserrat', sans-serif;
   --font-script: 'Alex Brush', cursive;
   
-  --shadow-subtle: 0 4px 20px rgba(56, 14, 20, 0.05);
-  --shadow-medium: 0 10px 30px rgba(56, 14, 20, 0.08);
-  --shadow-card: 0 8px 24px rgba(40, 8, 12, 0.06);
+  --shadow-subtle: 0 4px 20px rgba(158, 9, 17, 0.05);
+  --shadow-medium: 0 10px 30px rgba(158, 9, 17, 0.08);
+  --shadow-card: 0 8px 24px rgba(158, 9, 17, 0.06);
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
@@ -45,12 +108,18 @@
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: 'XB Niloofar', 'XBnilofar', var(--font-sans);
   background-color: var(--bg-parchment);
   color: var(--text-primary);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+}
+
+body, button, input, select, textarea,
+h1, h2, h3, h4, h5, h6,
+.brand-title, .section-title, .summary-title, .item-name, .modal-title, .copyright-container {
+  font-family: 'XB Niloofar', 'XBnilofar', var(--font-sans);
 }
 
 /* --------------------------------------------------------------------------
@@ -386,7 +455,7 @@ body {
 .select-field:focus {
   border-color: var(--border-focus);
   background-color: #ffffff;
-  box-shadow: 0 0 0 3px rgba(56, 14, 20, 0.08);
+  box-shadow: 0 0 0 3px rgba(158, 9, 17, 0.08);
 }
 
 .checkbox-wrap {
@@ -752,14 +821,14 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: 0 4px 16px rgba(56, 14, 20, 0.25);
+  box-shadow: 0 4px 16px rgba(158, 9, 17, 0.25);
   transition: all 0.25s ease;
 }
 
 .place-order-btn:hover {
   background-color: var(--primary-burgundy-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(56, 14, 20, 0.35);
+  box-shadow: 0 8px 24px rgba(158, 9, 17, 0.35);
 }
 
 .place-order-btn:active {
@@ -1009,6 +1078,7 @@ body {
 /* ==========================================================================
    SITE COPYRIGHT & AGENCY BRANDING STRIP
    ========================================================================== */
+footer,
 .site-copyright-footer {
   width: 100%;
   background-color: var(--bg-header);
@@ -1057,7 +1127,7 @@ body {
 }
 
 .copy-brand {
-  color: #df9f4f;
+  color: #edd8be;
   font-weight: 400;
 }
 
@@ -1067,6 +1137,7 @@ body {
   text-decoration: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
   vertical-align: middle;
+  opacity: 1;
 }
 
 .firevy-badge:hover {
@@ -1079,6 +1150,7 @@ body {
   width: auto;
   display: block;
   object-fit: contain;
+  filter: brightness(1);
 }
 
 @media (max-width: 580px) {

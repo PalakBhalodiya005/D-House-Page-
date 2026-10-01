@@ -3,22 +3,85 @@
    Executive Dashboard, Order Management & Razorpay Gateway Configuration
    ========================================================================== */
 
+/* Primary Brand & Typography - XB Niloofar (XBnilofar) */
+@font-face {
+  font-family: 'XB Niloofar';
+  src: local('XB Niloofar'), local('XBnilofar'), local('XBNiloofar'),
+       url('fonts/XBNiloofar.woff') format('woff'),
+       url('fonts/XBNiloofar.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'XBnilofar';
+  src: local('XB Niloofar'), local('XBnilofar'), local('XBNiloofar'),
+       url('fonts/XBNiloofar.woff') format('woff'),
+       url('fonts/XBNiloofar.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'XB Niloofar';
+  src: local('XB Niloofar Bold'), local('XBnilofar Bold'), local('XBNiloofarBd'),
+       url('fonts/XBNiloofarBd.woff') format('woff'),
+       url('fonts/XBNiloofarBd.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'XBnilofar';
+  src: local('XB Niloofar Bold'), local('XBnilofar Bold'), local('XBNiloofarBd'),
+       url('fonts/XBNiloofarBd.woff') format('woff'),
+       url('fonts/XBNiloofarBd.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'XB Niloofar';
+  src: local('XB Niloofar Italic'), local('XBnilofar Italic'), local('XBNiloofarIt'),
+       url('fonts/XBNiloofarIt.woff') format('woff'),
+       url('fonts/XBNiloofarIt.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'XBnilofar';
+  src: local('XB Niloofar Italic'), local('XBnilofar Italic'), local('XBNiloofarIt'),
+       url('fonts/XBNiloofarIt.woff') format('woff'),
+       url('fonts/XBNiloofarIt.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   --bg-admin: #f8f6f2;
-  --bg-card: #ffffff;
-  --bg-card-soft: #fbf9f5;
-  --bg-header: #350e13;
-  --bg-sidebar: #26070b;
+  --bg-surface: #ffffff;
+  --bg-surface-soft: #faf8f5;
+  --bg-header: #9E0911;
+  --bg-sidebar: #82070e;
   
-  --primary-burgundy: #380e14;
-  --primary-hover: #22060a;
+  --primary-color: #9E0911;
+  --primary-burgundy: #9E0911;
+  --primary-hover: #7f070e;
   --gold-accent: #c5a059;
   --gold-soft: #fcf7ec;
   --gold-border: #dfcca0;
 
   --border-light: #e8e0d5;
+  --border-active: #9E0911;
   --text-primary: #221714;
-  --text-heading: #26070b;
+  --text-heading: #1e0204;
   --text-muted: #6e5f56;
   --text-subtle: #8e8076;
 
@@ -28,8 +91,9 @@
   --status-delivered: #15803d;
   --status-cod: #7c3aed;
 
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans: 'Outfit', 'Montserrat', sans-serif;
+  --font-primary: 'XB Niloofar', 'XBnilofar', 'Outfit', 'Montserrat', sans-serif;
+  --font-serif: 'XB Niloofar', 'XBnilofar', 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'XB Niloofar', 'XBnilofar', 'Outfit', 'Montserrat', sans-serif;
   
   --shadow-card: 0 4px 20px rgba(56, 14, 20, 0.06);
   --shadow-hover: 0 8px 30px rgba(56, 14, 20, 0.12);
@@ -45,12 +109,18 @@
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: 'XB Niloofar', 'XBnilofar', var(--font-sans);
   background-color: var(--bg-admin);
   color: var(--text-primary);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+}
+
+body, button, input, select, textarea,
+h1, h2, h3, h4, h5, h6,
+.login-logo, .brand-title, .card-title, .metric-val {
+  font-family: 'XB Niloofar', 'XBnilofar', var(--font-sans);
 }
 
 /* --------------------------------------------------------------------------
@@ -62,7 +132,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: radial-gradient(circle at top center, #421118 0%, #200508 100%);
+  background: radial-gradient(circle at top center, #9E0911 0%, #3a0306 100%);
 }
 
 .login-card {
