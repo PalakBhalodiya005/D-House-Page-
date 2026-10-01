@@ -196,10 +196,44 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderConfig() {
-    const totalPrice =
-      currentConfig.metal.basePrice +
-      currentConfig.diamond.addPrice +
-      currentConfig.size.addPrice;
+    let baseAndDiamondPrice = currentConfig.metal.basePrice + currentConfig.diamond.addPrice;
+
+    // Check if admin has set a specific custom price in the Shopify Variants table for this combination
+    try {
+      const raw = localStorage.getItem('dhouse_product_config');
+      if (raw) {
+        const pConfig = JSON.parse(raw);
+        if (pConfig.variantOverrides) {
+          const mName = currentConfig.metal.name;
+          const dType = currentConfig.diamond.type;
+          const cName = currentConfig.color.name;
+
+          const possibleKeys = [
+            `${mName}::${dType}`,
+            `${cName}::${dType}`,
+            mName === 'Silver' ? `White Gold::${dType}` : '',
+            mName === '9K Gold' ? `Yellow Gold::${dType}` : '',
+            mName === '14K Gold' ? `Rose Gold::${dType}` : '',
+            mName === '18K Gold' ? `Dark Rose Gold::${dType}` : '',
+            cName === 'White' ? `White Gold::${dType}` : '',
+            cName === 'White' ? `Silver::${dType}` : '',
+            cName === 'Light Rose Gold' ? `Rose Gold::${dType}` : '',
+            cName === 'Dark Rose Gold' ? `18K Gold::${dType}` : ''
+          ].filter(Boolean);
+
+          for (const key of possibleKeys) {
+            if (pConfig.variantOverrides[key] !== undefined) {
+              baseAndDiamondPrice = parseInt(pConfig.variantOverrides[key], 10);
+              break;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+
+    const totalPrice = baseAndDiamondPrice + currentConfig.size.addPrice;
 
     if (priceDisplay) {
       priceDisplay.textContent = formatINR(totalPrice);
@@ -209,6 +243,94 @@ document.addEventListener('DOMContentLoaded', () => {
       specSummaryText.innerHTML = `Metal: ${currentConfig.metal.name} (${currentConfig.metal.purity}) &nbsp;|&nbsp; Bracelet Size: ${currentConfig.braceletSize.value} &nbsp;|&nbsp; Color: ${currentConfig.color.name} &nbsp;|&nbsp; Diamond: ${currentConfig.diamond.type} &nbsp;|&nbsp; Diamond Size: ${currentConfig.size.value} &nbsp;|&nbsp; Certificate: ${currentConfig.certificate.code}`;
     }
   }
+
+  // Load Admin-Configured Product Rates & Details
+  function applyAdminProductConfig() {
+    try {
+      const raw = localStorage.getItem('dhouse_product_config');
+      if (!raw) return;
+      const config = JSON.parse(raw);
+
+      // Update Titles
+      if (config.title) {
+        document.querySelectorAll('.product-title').forEach((el) => {
+          el.textContent = config.title;
+        });
+      }
+      if (config.tagline) {
+        document.querySelectorAll('.description-tagline').forEach((el) => {
+          el.textContent = config.tagline;
+        });
+      }
+
+      // Update Metal Cards (base price and purity)
+      if (config.metals) {
+        document.querySelectorAll('#metalSpheresGrid .choice-card').forEach((card) => {
+          const val = card.getAttribute('data-value');
+          if (config.metals[val]) {
+            const m = config.metals[val];
+            if (m.price !== undefined) card.setAttribute('data-price', m.price);
+            if (m.purity) {
+              card.setAttribute('data-purity', m.purity);
+              const detailSpan = card.querySelector('.card-detail span:first-child');
+              if (detailSpan) detailSpan.textContent = m.purity;
+            }
+          }
+        });
+      }
+
+      // Update Diamond Cards (addPrice and subtitle)
+      if (config.diamonds) {
+        document.querySelectorAll('#diamondGrid .choice-card').forEach((card) => {
+          const val = card.getAttribute('data-value');
+          if (config.diamonds[val]) {
+            const d = config.diamonds[val];
+            if (d.addPrice !== undefined) card.setAttribute('data-addprice', d.addPrice);
+            if (d.subtitle) {
+              const subSpan = card.querySelector('.card-detail span:first-child');
+              if (subSpan) subSpan.textContent = d.subtitle;
+            }
+          }
+        });
+      }
+
+      // Update Diamond Size Cards (addPrice)
+      if (config.sizes) {
+        document.querySelectorAll('#sizeGrid .choice-card').forEach((card) => {
+          const val = card.getAttribute('data-value');
+          if (config.sizes[val] && config.sizes[val].addPrice !== undefined) {
+            card.setAttribute('data-addprice', config.sizes[val].addPrice);
+          }
+        });
+      }
+
+      // Synchronize currentConfig with active DOM cards
+      const activeMetalCard = document.querySelector('#metalSpheresGrid .choice-card.active');
+      if (activeMetalCard) {
+        currentConfig.metal.name = activeMetalCard.getAttribute('data-value') || 'Silver';
+        currentConfig.metal.purity = activeMetalCard.getAttribute('data-purity') || '92.5%';
+        currentConfig.metal.basePrice = parseInt(activeMetalCard.getAttribute('data-price') || '48500', 10);
+      }
+
+      const activeDiamondCard = document.querySelector('#diamondGrid .choice-card.active');
+      if (activeDiamondCard) {
+        currentConfig.diamond.type = activeDiamondCard.getAttribute('data-value') || 'Moissanite';
+        currentConfig.diamond.addPrice = parseInt(activeDiamondCard.getAttribute('data-addprice') || '0', 10);
+      }
+
+      const activeSizeCard = document.querySelector('#sizeGrid .choice-card.active');
+      if (activeSizeCard) {
+        currentConfig.size.value = activeSizeCard.getAttribute('data-value') || '3 mm';
+        currentConfig.size.addPrice = parseInt(activeSizeCard.getAttribute('data-addprice') || '0', 10);
+      }
+    } catch (e) {
+      console.warn('Error applying admin product configuration:', e);
+    }
+  }
+
+  // Apply admin rates immediately
+  applyAdminProductConfig();
+  renderConfig();
 
   // Generic card group selection helper
   function setupSelectionGroup(containerSelector, onSelect) {
@@ -342,10 +464,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Helper to save current configuration & directly open checkout page
   function saveAndDirectCheckout() {
-    const totalPrice =
-      currentConfig.metal.basePrice +
-      currentConfig.diamond.addPrice +
-      currentConfig.size.addPrice;
+    let baseAndDiamond = currentConfig.metal.basePrice + currentConfig.diamond.addPrice;
+    try {
+      const raw = localStorage.getItem('dhouse_product_config');
+      if (raw) {
+        const pConfig = JSON.parse(raw);
+        if (pConfig.variantOverrides) {
+          const mName = currentConfig.metal.name;
+          const dType = currentConfig.diamond.type;
+          const cName = currentConfig.color.name;
+
+          const possibleKeys = [
+            `${mName}::${dType}`,
+            `${cName}::${dType}`,
+            mName === 'Silver' ? `White Gold::${dType}` : '',
+            mName === '9K Gold' ? `Yellow Gold::${dType}` : '',
+            mName === '14K Gold' ? `Rose Gold::${dType}` : '',
+            mName === '18K Gold' ? `Dark Rose Gold::${dType}` : '',
+            cName === 'White' ? `White Gold::${dType}` : '',
+            cName === 'White' ? `Silver::${dType}` : '',
+            cName === 'Light Rose Gold' ? `Rose Gold::${dType}` : '',
+            cName === 'Dark Rose Gold' ? `18K Gold::${dType}` : ''
+          ].filter(Boolean);
+
+          for (const key of possibleKeys) {
+            if (pConfig.variantOverrides[key] !== undefined) {
+              baseAndDiamond = parseInt(pConfig.variantOverrides[key], 10);
+              break;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+
+    const totalPrice = baseAndDiamond + currentConfig.size.addPrice;
 
     let selectedImg = metalConfigThumbs[currentMetal] || 'images/circle_silver.jpg';
     if (galleryImages && galleryImages.length > 0 && galleryImages[currentSlideIndex]) {
