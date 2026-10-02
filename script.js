@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     metal: {
       name: 'Silver',
       purity: '92.5%',
-      basePrice: 48500
+      basePrice: 260
     },
     braceletSize: {
       value: '7” (17.8 cm)'
@@ -191,40 +191,74 @@ document.addEventListener('DOMContentLoaded', () => {
   const priceDisplay = document.getElementById('priceDisplay');
   const specSummaryText = document.getElementById('specSummaryText');
 
-  function formatINR(number) {
-    return number.toLocaleString('en-IN');
+  function parseCleanPrice(val) {
+    if (typeof val === 'number') return Math.round(val);
+    if (!val) return 0;
+    let str = String(val).trim().replace(/,/g, '');
+    const isNegative = str.includes('-');
+    str = str.replace(/[^0-9.]/g, '');
+    const num = parseFloat(str);
+    if (isNaN(num)) return 0;
+    const result = Math.round(num);
+    return isNegative ? -result : result;
   }
 
-  function renderConfig() {
-    let baseAndDiamondPrice = currentConfig.metal.basePrice + currentConfig.diamond.addPrice;
+  function formatINR(number) {
+    return Math.max(0, Math.round(number)).toLocaleString('en-US');
+  }
 
-    // Check if admin has set a specific custom price in the Shopify Variants table for this combination
+  function getCurrentTotalPrice() {
+    let finalPrice = null;
+    const mName = currentConfig.metal.name;
+    const dType = currentConfig.diamond.type;
+    const sVal = currentConfig.size.value;
+    const cName = currentConfig.color.name;
+
     try {
       const raw = localStorage.getItem('dhouse_product_config');
       if (raw) {
         const pConfig = JSON.parse(raw);
         if (pConfig.variantOverrides) {
-          const mName = currentConfig.metal.name;
-          const dType = currentConfig.diamond.type;
-          const cName = currentConfig.color.name;
-
-          const possibleKeys = [
-            `${mName}::${dType}`,
-            `${cName}::${dType}`,
-            mName === 'Silver' ? `White Gold::${dType}` : '',
-            mName === '9K Gold' ? `Yellow Gold::${dType}` : '',
-            mName === '14K Gold' ? `Rose Gold::${dType}` : '',
-            mName === '18K Gold' ? `Dark Rose Gold::${dType}` : '',
-            cName === 'White' ? `White Gold::${dType}` : '',
-            cName === 'White' ? `Silver::${dType}` : '',
-            cName === 'Light Rose Gold' ? `Rose Gold::${dType}` : '',
-            cName === 'Dark Rose Gold' ? `18K Gold::${dType}` : ''
+          const possible3WayKeys = [
+            `${mName}::${dType}::${sVal}`,
+            `${cName}::${dType}::${sVal}`,
+            mName === 'Silver' ? `White Gold::${dType}::${sVal}` : '',
+            mName === '9K Gold' ? `Yellow Gold::${dType}::${sVal}` : '',
+            mName === '14K Gold' ? `Rose Gold::${dType}::${sVal}` : '',
+            mName === '18K Gold' ? `Dark Rose Gold::${dType}::${sVal}` : '',
+            cName === 'White' ? `White Gold::${dType}::${sVal}` : '',
+            cName === 'White' ? `Silver::${dType}::${sVal}` : '',
+            cName === 'Light Rose Gold' ? `Rose Gold::${dType}::${sVal}` : '',
+            cName === 'Dark Rose Gold' ? `18K Gold::${dType}::${sVal}` : ''
           ].filter(Boolean);
 
-          for (const key of possibleKeys) {
+          for (const key of possible3WayKeys) {
             if (pConfig.variantOverrides[key] !== undefined) {
-              baseAndDiamondPrice = parseInt(pConfig.variantOverrides[key], 10);
+              finalPrice = parseCleanPrice(pConfig.variantOverrides[key]);
               break;
+            }
+          }
+
+          // Fallback to 2-way if 3-way not explicitly present
+          if (finalPrice === null) {
+            const possible2WayKeys = [
+              `${mName}::${dType}`,
+              `${cName}::${dType}`,
+              mName === 'Silver' ? `White Gold::${dType}` : '',
+              mName === '9K Gold' ? `Yellow Gold::${dType}` : '',
+              mName === '14K Gold' ? `Rose Gold::${dType}` : '',
+              mName === '18K Gold' ? `Dark Rose Gold::${dType}` : '',
+              cName === 'White' ? `White Gold::${dType}` : '',
+              cName === 'White' ? `Silver::${dType}` : '',
+              cName === 'Light Rose Gold' ? `Rose Gold::${dType}` : '',
+              cName === 'Dark Rose Gold' ? `18K Gold::${dType}` : ''
+            ].filter(Boolean);
+
+            for (const key of possible2WayKeys) {
+              if (pConfig.variantOverrides[key] !== undefined) {
+                finalPrice = parseCleanPrice(pConfig.variantOverrides[key]) + currentConfig.size.addPrice;
+                break;
+              }
             }
           }
         }
@@ -233,7 +267,15 @@ document.addEventListener('DOMContentLoaded', () => {
       console.warn(e);
     }
 
-    const totalPrice = baseAndDiamondPrice + currentConfig.size.addPrice;
+    if (finalPrice === null) {
+      finalPrice = currentConfig.metal.basePrice + currentConfig.diamond.addPrice + currentConfig.size.addPrice;
+    }
+
+    return finalPrice;
+  }
+
+  function renderConfig() {
+    const totalPrice = getCurrentTotalPrice();
 
     if (priceDisplay) {
       priceDisplay.textContent = formatINR(totalPrice);
@@ -309,19 +351,19 @@ document.addEventListener('DOMContentLoaded', () => {
       if (activeMetalCard) {
         currentConfig.metal.name = activeMetalCard.getAttribute('data-value') || 'Silver';
         currentConfig.metal.purity = activeMetalCard.getAttribute('data-purity') || '92.5%';
-        currentConfig.metal.basePrice = parseInt(activeMetalCard.getAttribute('data-price') || '48500', 10);
+        currentConfig.metal.basePrice = parseCleanPrice(activeMetalCard.getAttribute('data-price') || '260');
       }
 
       const activeDiamondCard = document.querySelector('#diamondGrid .choice-card.active');
       if (activeDiamondCard) {
         currentConfig.diamond.type = activeDiamondCard.getAttribute('data-value') || 'Moissanite';
-        currentConfig.diamond.addPrice = parseInt(activeDiamondCard.getAttribute('data-addprice') || '0', 10);
+        currentConfig.diamond.addPrice = parseCleanPrice(activeDiamondCard.getAttribute('data-addprice') || '0');
       }
 
       const activeSizeCard = document.querySelector('#sizeGrid .choice-card.active');
       if (activeSizeCard) {
         currentConfig.size.value = activeSizeCard.getAttribute('data-value') || '3 mm';
-        currentConfig.size.addPrice = parseInt(activeSizeCard.getAttribute('data-addprice') || '0', 10);
+        currentConfig.size.addPrice = parseCleanPrice(activeSizeCard.getAttribute('data-addprice') || '0');
       }
     } catch (e) {
       console.warn('Error applying admin product configuration:', e);
@@ -405,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       card.classList.add('active');
       card.setAttribute('aria-selected', 'true');
-      
+
       const colorValue = card.getAttribute('data-value');
       currentConfig.color.name = colorValue;
 
@@ -464,42 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Helper to save current configuration & directly open checkout page
   function saveAndDirectCheckout() {
-    let baseAndDiamond = currentConfig.metal.basePrice + currentConfig.diamond.addPrice;
-    try {
-      const raw = localStorage.getItem('dhouse_product_config');
-      if (raw) {
-        const pConfig = JSON.parse(raw);
-        if (pConfig.variantOverrides) {
-          const mName = currentConfig.metal.name;
-          const dType = currentConfig.diamond.type;
-          const cName = currentConfig.color.name;
-
-          const possibleKeys = [
-            `${mName}::${dType}`,
-            `${cName}::${dType}`,
-            mName === 'Silver' ? `White Gold::${dType}` : '',
-            mName === '9K Gold' ? `Yellow Gold::${dType}` : '',
-            mName === '14K Gold' ? `Rose Gold::${dType}` : '',
-            mName === '18K Gold' ? `Dark Rose Gold::${dType}` : '',
-            cName === 'White' ? `White Gold::${dType}` : '',
-            cName === 'White' ? `Silver::${dType}` : '',
-            cName === 'Light Rose Gold' ? `Rose Gold::${dType}` : '',
-            cName === 'Dark Rose Gold' ? `18K Gold::${dType}` : ''
-          ].filter(Boolean);
-
-          for (const key of possibleKeys) {
-            if (pConfig.variantOverrides[key] !== undefined) {
-              baseAndDiamond = parseInt(pConfig.variantOverrides[key], 10);
-              break;
-            }
-          }
-        }
-      }
-    } catch (e) {
-      console.warn(e);
-    }
-
-    const totalPrice = baseAndDiamond + currentConfig.size.addPrice;
+    const totalPrice = getCurrentTotalPrice();
 
     let selectedImg = metalConfigThumbs[currentMetal] || 'images/circle_silver.jpg';
     if (galleryImages && galleryImages.length > 0 && galleryImages[currentSlideIndex]) {
@@ -577,7 +584,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const savedWa = localStorage.getItem('dhouse_whatsapp_number');
       const phoneNumber = (savedWa && savedWa.trim()) ? savedWa.trim().replace(/[^0-9]/g, '') : '919898948986';
       const text = encodeURIComponent(
-        `Hi D'House Jewels! I would like to inquire about the Luster Bracelet:\n- Metal: ${currentConfig.metal.name} (${currentConfig.metal.purity})\n- Bracelet Size: ${currentConfig.braceletSize.value}\n- Color: ${currentConfig.color.name}\n- Diamond: ${currentConfig.diamond.type}\n- Diamond Size: ${currentConfig.size.value}\n- Certificate: ${currentConfig.certificate.code}\n- Price: ₹${priceDisplay ? priceDisplay.textContent : '48,500'}`
+        `Hi D'House Jewels! I would like to inquire about the Luster Bracelet:\n- Metal: ${currentConfig.metal.name} (${currentConfig.metal.purity})\n- Bracelet Size: ${currentConfig.braceletSize.value}\n- Color: ${currentConfig.color.name}\n- Diamond: ${currentConfig.diamond.type}\n- Diamond Size: ${currentConfig.size.value}\n- Certificate: ${currentConfig.certificate.code}\n- Price: $${priceDisplay ? priceDisplay.textContent : '48,500'}`
       );
       window.open(`https://api.whatsapp.com/send?phone=${phoneNumber || '919898948986'}&text=${text}`, '_blank');
     });

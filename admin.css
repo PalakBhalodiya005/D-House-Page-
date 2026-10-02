@@ -1955,7 +1955,7 @@ input:checked+.slider:before {
 .shopify-footer-strip {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 12px 4px 40px;
   font-size: 13px;
   color: #5c5f62;

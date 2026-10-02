@@ -76,6 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sidebarBackdrop) sidebarBackdrop.classList.remove('active');
   }
 
+  const topbarPageTitle = document.querySelector('.topbar-page-title');
+
   tabBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
       tabBtns.forEach((b) => b.classList.remove('active'));
@@ -85,6 +87,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const targetId = btn.getAttribute('data-tab');
       const targetEl = document.getElementById(targetId);
       if (targetEl) targetEl.classList.add('active');
+
+      if (topbarPageTitle) {
+        if (targetId === 'tabOrders') {
+          topbarPageTitle.textContent = 'Executive Dashboard';
+        } else if (targetId === 'tabPaymentSettings') {
+          topbarPageTitle.textContent = 'Payment Gateway Settings';
+        } else if (targetId === 'tabProductSettings') {
+          topbarPageTitle.textContent = 'Product Edit & Variants';
+        }
+      }
 
       closeMobileSidebar();
     });
@@ -154,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (razorpayLinkForm) {
     razorpayLinkForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      
+
       const cleanWa = whatsappNumberInput ? whatsappNumberInput.value.trim().replace(/[^0-9]/g, '') : '919898948986';
 
       localStorage.setItem('dhouse_enable_razorpay', toggleRazorpay ? String(toggleRazorpay.checked) : 'true');
@@ -198,31 +210,54 @@ document.addEventListener('DOMContentLoaded', () => {
     title: 'Luster Bracelet',
     tagline: 'Luster — brilliance that speaks from every angle.',
     metals: {
-      'Silver': { price: 48500, purity: '92.5% Pure Silver', colorName: 'White Gold', swatch: '#d1d5db', img: 'images/wrist_silver.jpg', sku: 'LNK-41-W' },
-      '9K Gold': { price: 78500, purity: '40% Pure Gold', colorName: 'Yellow Gold', swatch: '#e5a93c', img: 'images/wrist_9k.jpg', sku: 'LNK-41-Y' },
-      '14K Gold': { price: 112000, purity: '59% Pure Gold', colorName: 'Rose Gold', swatch: '#b76e79', img: 'images/wrist_14k.jpg', sku: 'LNK-41-RG' },
-      '18K Gold': { price: 145000, purity: '76% Pure Gold', colorName: 'Dark Rose Gold', swatch: '#b88e38', img: 'images/wrist_18k.jpg', sku: 'LNK-41-18K' }
+      'Silver': { price: 260, purity: '92.5% Pure Silver', colorName: 'White Gold', swatch: '#d1d5db', img: 'images/wrist_silver.jpg', sku: 'LNK-41-W' },
+      '9K Gold': { price: 480, purity: '40% Pure Gold', colorName: 'Yellow Gold', swatch: '#e5a93c', img: 'images/wrist_9k.jpg', sku: 'LNK-41-Y' },
+      '14K Gold': { price: 750, purity: '59% Pure Gold', colorName: 'Rose Gold', swatch: '#b76e79', img: 'images/wrist_14k.jpg', sku: 'LNK-41-RG' },
+      '18K Gold': { price: 990, purity: '76% Pure Gold', colorName: 'Dark Rose Gold', swatch: '#b88e38', img: 'images/wrist_18k.jpg', sku: 'LNK-41-18K' }
     },
     diamonds: {
       'Moissanite': { addPrice: 0, subtitle: 'Brilliant shine, great value' },
-      'CVD': { addPrice: 22000, subtitle: 'Lab grown, identical brilliance' },
-      'Natural': { addPrice: 85000, subtitle: 'Rare, authentic, timeless' }
+      'CVD': { addPrice: 150, subtitle: 'Lab grown, identical brilliance' },
+      'Natural': { addPrice: 450, subtitle: 'Rare, authentic, timeless' }
     },
     sizes: {
-      '2 mm': { addPrice: -8000 },
+      '2 mm': { addPrice: -40 },
       '3 mm': { addPrice: 0 },
-      '4 mm': { addPrice: 18500 }
+      '4 mm': { addPrice: 80 }
     },
     variantOverrides: {}
   };
 
   let currentProductConfig = JSON.parse(JSON.stringify(defaultProductConfig));
 
+  function parseCleanNumber(val) {
+    if (typeof val === 'number') return Math.round(val);
+    if (!val) return 0;
+    let str = String(val).trim().replace(/,/g, '');
+    const isNegative = str.includes('-');
+    str = str.replace(/[^0-9.]/g, '');
+    const num = parseFloat(str);
+    if (isNaN(num)) return 0;
+    const result = Math.round(num);
+    return isNegative ? -result : result;
+  }
+
+  function formatPriceValue(val) {
+    const num = parseCleanNumber(val);
+    return num.toLocaleString('en-US') + '.00';
+  }
+
   function getSavedProductConfig() {
     try {
       const raw = localStorage.getItem('dhouse_product_config');
       if (raw) {
-        return Object.assign({}, defaultProductConfig, JSON.parse(raw));
+        const parsed = JSON.parse(raw);
+        if (parsed.metals && parsed.metals.Silver && parsed.metals.Silver.price > 5000) {
+          localStorage.removeItem('dhouse_product_config');
+          localStorage.removeItem('dhouse_variant_prices');
+          return JSON.parse(JSON.stringify(defaultProductConfig));
+        }
+        return Object.assign({}, defaultProductConfig, parsed);
       }
     } catch (e) {
       console.warn('Error reading dhouse_product_config:', e);
@@ -230,13 +265,22 @@ document.addEventListener('DOMContentLoaded', () => {
     return JSON.parse(JSON.stringify(defaultProductConfig));
   }
 
-  function formatPriceValue(val) {
-    const num = parseInt(String(val).replace(/[^0-9]/g, ''), 10) || 0;
-    return num.toLocaleString('en-IN') + '.00';
-  }
-
-  function parseCleanNumber(val) {
-    return parseInt(String(val).replace(/[^0-9]/g, ''), 10) || 0;
+  function getCombinationPrice(mKey, dKey, sKey) {
+    const overrides = currentProductConfig.variantOverrides || {};
+    const exactKey = `${mKey}::${dKey}::${sKey}`;
+    if (overrides[exactKey] !== undefined) {
+      return parseCleanNumber(overrides[exactKey]);
+    }
+    // Check 2-way fallback
+    if (overrides[`${mKey}::${dKey}`] !== undefined) {
+      const sizeDiff = currentProductConfig.sizes?.[sKey]?.addPrice ?? 0;
+      return parseCleanNumber(overrides[`${mKey}::${dKey}`]) + sizeDiff;
+    }
+    // Base formula
+    const basePrice = currentProductConfig.metals?.[mKey]?.price ?? 260;
+    const diamondAdd = currentProductConfig.diamonds?.[dKey]?.addPrice ?? 0;
+    const sizeAdd = currentProductConfig.sizes?.[sKey]?.addPrice ?? 0;
+    return basePrice + diamondAdd + sizeAdd;
   }
 
   function renderShopifyVariantsTable() {
@@ -246,22 +290,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const config = currentProductConfig;
     const metals = config.metals || defaultProductConfig.metals;
     const diamonds = config.diamonds || defaultProductConfig.diamonds;
-    const overrides = config.variantOverrides || {};
+    const sizes = config.sizes || defaultProductConfig.sizes;
 
-    const groupBy = shopifyGroupBySelect ? shopifyGroupBySelect.value : 'color';
+    const groupBy = shopifyGroupBySelect ? shopifyGroupBySelect.value : 'metal';
+    const metalKeys = Object.keys(metals);
+    const diamondKeys = Object.keys(diamonds);
+    const sizeKeys = Object.keys(sizes);
     let totalVariantCount = 0;
 
     if (groupBy === 'diamond') {
-      // Group by Diamond Type
-      const diamondKeys = Object.keys(diamonds);
-      const metalKeys = Object.keys(metals);
-
+      // 1. Group By: Diamond Selection
       diamondKeys.forEach((dKey, groupIdx) => {
-        const dInfo = diamonds[dKey];
+        const dInfo = diamonds[dKey] || {};
         const addOn = dInfo.addPrice ?? 0;
         const groupId = `group-d-${groupIdx}`;
+        const subVariantCount = metalKeys.length * sizeKeys.length;
 
-        // Master Group Row for Diamond
+        // Master Diamond Group Row
         const groupTr = document.createElement('tr');
         groupTr.className = 'variant-group-row';
         groupTr.setAttribute('data-group-id', groupId);
@@ -282,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="variant-title-text">
                   <span>${dKey}</span>
                   <span class="variant-dot"></span>
-                  <span class="variant-count-tag">${metalKeys.length} metals</span>
+                  <span class="variant-count-tag">${subVariantCount} variants</span>
                 </div>
                 <div style="font-size: 11px; color: #6d7175; margin-top: 1px;">${dInfo.subtitle || 'Diamond Selection'}</div>
               </div>
@@ -290,103 +335,201 @@ document.addEventListener('DOMContentLoaded', () => {
           </td>
           <td>
             <div class="shopify-price-input-box">
-              <span class="price-currency-symbol">+₹</span>
+              <span class="price-currency-symbol">+$</span>
               <input type="text" class="shopify-price-input master-diamond-addon" data-diamond-key="${dKey}" value="${formatPriceValue(addOn)}">
             </div>
           </td>
-          <td>
-            <span style="font-weight: 500; color: #202223;">0</span>
-          </td>
+          <td><span style="font-weight: 500; color: #202223;">0</span></td>
           <td>
             <div class="publishing-channels">
-              <span class="publishing-channel-item">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                2
-              </span>
-              <span class="publishing-channel-item">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                0
-              </span>
+              <span class="publishing-channel-item"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> 2</span>
+              <span class="publishing-channel-item"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> 0</span>
             </div>
           </td>
           <td style="text-align: right;">
             <button type="button" class="shopify-row-toggle-btn" data-toggle="${groupId}" title="Collapse / Expand">
-              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
-                <polyline points="18 15 12 9 6 15"></polyline>
-              </svg>
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
             </button>
           </td>
         `;
-
         shopifyVariantsTableBody.appendChild(groupTr);
 
-        // Child rows for each metal
-        metalKeys.forEach((mKey, mIdx) => {
-          totalVariantCount++;
-          const mInfo = metals[mKey];
-          const basePrice = mInfo.price ?? 48500;
-          const colorTitle = mInfo.colorName || mKey;
-          const overrideKey = `${mKey}::${dKey}`;
-          const finalPrice = overrides[overrideKey] !== undefined ? overrides[overrideKey] : (basePrice + addOn);
-          const subSku = `${mInfo.sku || 'LNK'}-${groupIdx + 1}`;
-          const isLast = mIdx === metalKeys.length - 1;
+        // Child rows: Metal x Size
+        let childIdx = 0;
+        metalKeys.forEach((mKey) => {
+          const mInfo = metals[mKey] || {};
+          const thumbSrc = mInfo.img || 'images/wrist_silver.jpg';
+          sizeKeys.forEach((sKey) => {
+            totalVariantCount++;
+            childIdx++;
+            const isLast = childIdx === subVariantCount;
+            const combPrice = getCombinationPrice(mKey, dKey, sKey);
+            const overrideKey = `${mKey}::${dKey}::${sKey}`;
 
-          const subTr = document.createElement('tr');
-          subTr.className = `variant-sub-row child-of-${groupId}`;
-
-          subTr.innerHTML = `
-            <td>
-              <div style="display: flex; align-items: center; gap: 4px;">
-                <span class="tree-line">${isLast ? '└──' : '├──'}</span>
-                <input type="checkbox" class="shopify-checkbox sub-checkbox" data-group="${groupId}">
-              </div>
-            </td>
-            <td>
-              <div class="variant-sub-indent">
-                <div class="variant-thumb-box" style="width: 32px; height: 32px;">
-                  <img src="${mInfo.img || 'images/wrist_silver.jpg'}" alt="${colorTitle}">
+            const subTr = document.createElement('tr');
+            subTr.className = `variant-sub-row child-of-${groupId}`;
+            subTr.innerHTML = `
+              <td>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                  <span class="tree-line">${isLast ? '└──' : '├──'}</span>
+                  <input type="checkbox" class="shopify-checkbox sub-checkbox" data-group="${groupId}">
                 </div>
-                <div>
-                  <div style="display: flex; align-items: center;">
-                    <span style="font-weight: 500; color: #202223;">${colorTitle}</span>
-                    <span class="badge-new">New</span>
+              </td>
+              <td>
+                <div class="variant-sub-indent">
+                  <div class="variant-thumb-box" style="width: 32px; height: 32px;">
+                    <img src="${thumbSrc}" alt="${mKey}">
                   </div>
-                  <div class="sku-badge">${subSku} • ${mInfo.purity}</div>
+                  <div>
+                    <div style="display: flex; align-items: center;">
+                      <span style="font-weight: 500; color: #202223;">${mKey} / ${sKey}</span>
+                      <span class="badge-new">New</span>
+                    </div>
+                    <div class="sku-badge">${mInfo.sku || 'LNK'}-${childIdx} • ${mInfo.purity || 'Bespoke'}</div>
+                  </div>
                 </div>
-              </div>
-            </td>
-            <td>
-              <div class="shopify-price-input-box">
-                <span class="price-currency-symbol">₹</span>
-                <input type="text" class="shopify-price-input sub-variant-price" data-metal-key="${mKey}" data-diamond-key="${dKey}" data-override-key="${overrideKey}" value="${formatPriceValue(finalPrice)}">
-              </div>
-            </td>
-            <td><span style="color: #6d7175;">-</span></td>
-            <td>
-              <div class="publishing-channels">
-                <span class="publishing-channel-item"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> 2</span>
-                <span class="publishing-channel-item"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> 0</span>
-              </div>
-            </td>
-            <td></td>
-          `;
+              </td>
+              <td>
+                <div class="shopify-price-input-box">
+                  <span class="price-currency-symbol">$</span>
+                  <input type="text" class="shopify-price-input sub-variant-price" data-metal-key="${mKey}" data-diamond-key="${dKey}" data-size-key="${sKey}" data-override-key="${overrideKey}" value="${formatPriceValue(combPrice)}">
+                </div>
+              </td>
+              <td><span style="color: #6d7175;">0</span></td>
+              <td>
+                <div class="publishing-channels">
+                  <span class="publishing-channel-item"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> 2</span>
+                  <span class="publishing-channel-item"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> 0</span>
+                </div>
+              </td>
+              <td></td>
+            `;
+            shopifyVariantsTableBody.appendChild(subTr);
+          });
+        });
+      });
 
-          shopifyVariantsTableBody.appendChild(subTr);
+    } else if (groupBy === 'size') {
+      // 2. Group By: Diamond Size
+      sizeKeys.forEach((sKey, groupIdx) => {
+        const sInfo = sizes[sKey] || {};
+        const addOn = sInfo.addPrice ?? 0;
+        const groupId = `group-s-${groupIdx}`;
+        const subVariantCount = metalKeys.length * diamondKeys.length;
+
+        // Master Size Group Row
+        const groupTr = document.createElement('tr');
+        groupTr.className = 'variant-group-row';
+        groupTr.setAttribute('data-group-id', groupId);
+
+        groupTr.innerHTML = `
+          <td>
+            <input type="checkbox" class="shopify-checkbox group-checkbox" data-group="${groupId}">
+          </td>
+          <td>
+            <div class="variant-title-wrap">
+              <div class="variant-thumb-box">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#008060" stroke-width="1.8" fill="none">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <polyline points="12 7 12 12 15 14"></polyline>
+                </svg>
+              </div>
+              <div>
+                <div class="variant-title-text">
+                  <span>${sKey}</span>
+                  <span class="variant-dot"></span>
+                  <span class="variant-count-tag">${subVariantCount} variants</span>
+                </div>
+                <div style="font-size: 11px; color: #6d7175; margin-top: 1px;">Diamond Dimension</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="shopify-price-input-box">
+              <span class="price-currency-symbol">${addOn >= 0 ? '+$' : '-$'}</span>
+              <input type="text" class="shopify-price-input master-size-addon" data-size-key="${sKey}" value="${formatPriceValue(Math.abs(addOn))}">
+            </div>
+          </td>
+          <td><span style="font-weight: 500; color: #202223;">0</span></td>
+          <td>
+            <div class="publishing-channels">
+              <span class="publishing-channel-item"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> 2</span>
+              <span class="publishing-channel-item"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> 0</span>
+            </div>
+          </td>
+          <td style="text-align: right;">
+            <button type="button" class="shopify-row-toggle-btn" data-toggle="${groupId}" title="Collapse / Expand">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+            </button>
+          </td>
+        `;
+        shopifyVariantsTableBody.appendChild(groupTr);
+
+        // Child rows: Metal x Diamond
+        let childIdx = 0;
+        metalKeys.forEach((mKey) => {
+          const mInfo = metals[mKey] || {};
+          const thumbSrc = mInfo.img || 'images/wrist_silver.jpg';
+          diamondKeys.forEach((dKey) => {
+            totalVariantCount++;
+            childIdx++;
+            const isLast = childIdx === subVariantCount;
+            const combPrice = getCombinationPrice(mKey, dKey, sKey);
+            const overrideKey = `${mKey}::${dKey}::${sKey}`;
+
+            const subTr = document.createElement('tr');
+            subTr.className = `variant-sub-row child-of-${groupId}`;
+            subTr.innerHTML = `
+              <td>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                  <span class="tree-line">${isLast ? '└──' : '├──'}</span>
+                  <input type="checkbox" class="shopify-checkbox sub-checkbox" data-group="${groupId}">
+                </div>
+              </td>
+              <td>
+                <div class="variant-sub-indent">
+                  <div class="variant-thumb-box" style="width: 32px; height: 32px;">
+                    <img src="${thumbSrc}" alt="${mKey}">
+                  </div>
+                  <div>
+                    <div style="display: flex; align-items: center;">
+                      <span style="font-weight: 500; color: #202223;">${mKey} / ${dKey}</span>
+                      <span class="badge-new">New</span>
+                    </div>
+                    <div class="sku-badge">${mInfo.sku || 'LNK'}-${childIdx} • ${sKey}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="shopify-price-input-box">
+                  <span class="price-currency-symbol">$</span>
+                  <input type="text" class="shopify-price-input sub-variant-price" data-metal-key="${mKey}" data-diamond-key="${dKey}" data-size-key="${sKey}" data-override-key="${overrideKey}" value="${formatPriceValue(combPrice)}">
+                </div>
+              </td>
+              <td><span style="color: #6d7175;">0</span></td>
+              <td>
+                <div class="publishing-channels">
+                  <span class="publishing-channel-item"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> 2</span>
+                  <span class="publishing-channel-item"><svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> 0</span>
+                </div>
+              </td>
+              <td></td>
+            `;
+            shopifyVariantsTableBody.appendChild(subTr);
+          });
         });
       });
 
     } else {
-      // Default: Group by Color / Metal
-      const metalKeys = Object.keys(metals);
-      const diamondKeys = Object.keys(diamonds);
-
+      // 3. Default Group By: Metal Selection (matching Shopify style perfectly)
       metalKeys.forEach((mKey, groupIdx) => {
-        const metalInfo = metals[mKey];
-        const basePrice = metalInfo.price ?? 48500;
+        const metalInfo = metals[mKey] || {};
+        const basePrice = metalInfo.price ?? 260;
         const colorTitle = metalInfo.colorName || mKey;
         const thumbSrc = metalInfo.img || 'images/wrist_silver.jpg';
         const skuPrefix = metalInfo.sku || `LNK-41-${groupIdx + 1}`;
         const groupId = `group-${groupIdx}`;
+        const subVariantCount = diamondKeys.length * sizeKeys.length;
 
         // Master Group Row
         const groupTr = document.createElement('tr');
@@ -400,17 +543,13 @@ document.addEventListener('DOMContentLoaded', () => {
           <td>
             <div class="variant-title-wrap">
               <div class="variant-thumb-box">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="#008060" stroke-width="1.8" fill="none">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                  <polyline points="21 15 16 10 5 21"></polyline>
-                </svg>
+                <img src="${thumbSrc}" alt="${mKey}">
               </div>
               <div>
                 <div class="variant-title-text">
-                  <span>${colorTitle}</span>
+                  <span>${mKey}</span>
                   <span class="variant-dot"></span>
-                  <span class="variant-count-tag">${diamondKeys.length} variants</span>
+                  <span class="variant-count-tag">${subVariantCount} variants</span>
                 </div>
                 <div style="font-size: 11px; color: #6d7175; margin-top: 1px;">${metalInfo.purity || mKey}</div>
               </div>
@@ -418,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </td>
           <td>
             <div class="shopify-price-input-box">
-              <span class="price-currency-symbol">₹</span>
+              <span class="price-currency-symbol">$</span>
               <input type="text" class="shopify-price-input master-group-price" data-metal-key="${mKey}" value="${formatPriceValue(basePrice)}">
             </div>
           </td>
@@ -448,65 +587,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
         shopifyVariantsTableBody.appendChild(groupTr);
 
-        // Child Sub-Variant Rows
-        diamondKeys.forEach((dKey, dIdx) => {
-          totalVariantCount++;
-          const dInfo = diamonds[dKey];
-          const addOn = dInfo.addPrice ?? 0;
-          const overrideKey = `${mKey}::${dKey}`;
-          const finalPrice = overrides[overrideKey] !== undefined ? overrides[overrideKey] : (basePrice + addOn);
-          const subSku = `${skuPrefix}-${dIdx + 1}`;
-          const isLastChild = dIdx === diamondKeys.length - 1;
+        // Child Sub-Variant Rows: Diamond x Size (e.g. Moissanite / 2 mm, Moissanite / 3 mm, CVD / 2 mm...)
+        let childIdx = 0;
+        diamondKeys.forEach((dKey) => {
+          sizeKeys.forEach((sKey) => {
+            totalVariantCount++;
+            childIdx++;
+            const isLast = childIdx === subVariantCount;
+            const combPrice = getCombinationPrice(mKey, dKey, sKey);
+            const subSku = `${skuPrefix}-${childIdx}`;
+            const overrideKey = `${mKey}::${dKey}::${sKey}`;
 
-          const subTr = document.createElement('tr');
-          subTr.className = `variant-sub-row child-of-${groupId}`;
+            const subTr = document.createElement('tr');
+            subTr.className = `variant-sub-row child-of-${groupId}`;
 
-          subTr.innerHTML = `
-            <td>
-              <div style="display: flex; align-items: center; gap: 4px;">
-                <span class="tree-line">${isLastChild ? '└──' : '├──'}</span>
-                <input type="checkbox" class="shopify-checkbox sub-checkbox" data-group="${groupId}">
-              </div>
-            </td>
-            <td>
-              <div class="variant-sub-indent">
-                <div class="variant-thumb-box" style="width: 32px; height: 32px;">
-                  <img src="${thumbSrc}" alt="${colorTitle}">
+            subTr.innerHTML = `
+              <td>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                  <span class="tree-line">${isLast ? '└──' : '├──'}</span>
+                  <input type="checkbox" class="shopify-checkbox sub-checkbox" data-group="${groupId}">
                 </div>
-                <div>
-                  <div style="display: flex; align-items: center;">
-                    <span style="font-weight: 500; color: #202223;">${dKey}</span>
-                    <span class="badge-new">New</span>
+              </td>
+              <td>
+                <div class="variant-sub-indent">
+                  <div class="variant-thumb-box" style="width: 32px; height: 32px;">
+                    <img src="${thumbSrc}" alt="${colorTitle}">
                   </div>
-                  <div class="sku-badge">${subSku} • 3 mm</div>
+                  <div>
+                    <div style="display: flex; align-items: center;">
+                      <span style="font-weight: 500; color: #202223;">${dKey} / ${sKey}</span>
+                      <span class="badge-new">New</span>
+                    </div>
+                    <div class="sku-badge">${subSku} • ${sKey}</div>
+                  </div>
                 </div>
-              </div>
-            </td>
-            <td>
-              <div class="shopify-price-input-box">
-                <span class="price-currency-symbol">₹</span>
-                <input type="text" class="shopify-price-input sub-variant-price" data-metal-key="${mKey}" data-diamond-key="${dKey}" data-override-key="${overrideKey}" value="${formatPriceValue(finalPrice)}">
-              </div>
-            </td>
-            <td>
-              <span style="color: #6d7175;">-</span>
-            </td>
-            <td>
-              <div class="publishing-channels">
-                <span class="publishing-channel-item">
-                  <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                  2
-                </span>
-                <span class="publishing-channel-item">
-                  <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                  0
-                </span>
-              </div>
-            </td>
-            <td></td>
-          `;
+              </td>
+              <td>
+                <div class="shopify-price-input-box">
+                  <span class="price-currency-symbol">$</span>
+                  <input type="text" class="shopify-price-input sub-variant-price" data-metal-key="${mKey}" data-diamond-key="${dKey}" data-size-key="${sKey}" data-override-key="${overrideKey}" value="${formatPriceValue(combPrice)}">
+                </div>
+              </td>
+              <td>
+                <span style="color: #6d7175;">0</span>
+              </td>
+              <td>
+                <div class="publishing-channels">
+                  <span class="publishing-channel-item">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                    2
+                  </span>
+                  <span class="publishing-channel-item">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    0
+                  </span>
+                </div>
+              </td>
+              <td></td>
+            `;
 
-          shopifyVariantsTableBody.appendChild(subTr);
+            shopifyVariantsTableBody.appendChild(subTr);
+          });
         });
       });
     }
@@ -550,7 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Master Group Price edit -> automatically update sub-variant inputs
+    // Master Group Price edit (when grouped by metal) -> automatically update sub-variant inputs
     document.querySelectorAll('.master-group-price').forEach((input) => {
       input.addEventListener('change', () => {
         const mKey = input.getAttribute('data-metal-key');
@@ -565,17 +706,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const childInputs = document.querySelectorAll(`.sub-variant-price[data-metal-key="${mKey}"]`);
         childInputs.forEach((subInput) => {
           const dKey = subInput.getAttribute('data-diamond-key');
-          const addOn = currentProductConfig.diamonds?.[dKey]?.addPrice ?? 0;
-          const calculatedPrice = newBase + addOn;
+          const sKey = subInput.getAttribute('data-size-key');
+          const dAdd = currentProductConfig.diamonds?.[dKey]?.addPrice ?? 0;
+          const sAdd = currentProductConfig.sizes?.[sKey]?.addPrice ?? 0;
+          const calculatedPrice = newBase + dAdd + sAdd;
           subInput.value = formatPriceValue(calculatedPrice);
-          const overrideKey = `${mKey}::${dKey}`;
+          const overrideKey = `${mKey}::${dKey}::${sKey}`;
           if (!currentProductConfig.variantOverrides) currentProductConfig.variantOverrides = {};
           currentProductConfig.variantOverrides[overrideKey] = calculatedPrice;
         });
       });
     });
 
-    // Master Diamond Addon edit
+    // Master Diamond Addon edit (when grouped by diamond)
     document.querySelectorAll('.master-diamond-addon').forEach((input) => {
       input.addEventListener('change', () => {
         const dKey = input.getAttribute('data-diamond-key');
@@ -590,17 +733,46 @@ document.addEventListener('DOMContentLoaded', () => {
         const childInputs = document.querySelectorAll(`.sub-variant-price[data-diamond-key="${dKey}"]`);
         childInputs.forEach((subInput) => {
           const mKey = subInput.getAttribute('data-metal-key');
-          const basePrice = currentProductConfig.metals?.[mKey]?.price ?? 48500;
-          const calculatedPrice = basePrice + newAddon;
+          const sKey = subInput.getAttribute('data-size-key');
+          const basePrice = currentProductConfig.metals?.[mKey]?.price ?? 260;
+          const sAdd = currentProductConfig.sizes?.[sKey]?.addPrice ?? 0;
+          const calculatedPrice = basePrice + newAddon + sAdd;
           subInput.value = formatPriceValue(calculatedPrice);
-          const overrideKey = `${mKey}::${dKey}`;
+          const overrideKey = `${mKey}::${dKey}::${sKey}`;
           if (!currentProductConfig.variantOverrides) currentProductConfig.variantOverrides = {};
           currentProductConfig.variantOverrides[overrideKey] = calculatedPrice;
         });
       });
     });
 
-    // Sub-variant price input edit
+    // Master Size Addon edit (when grouped by size)
+    document.querySelectorAll('.master-size-addon').forEach((input) => {
+      input.addEventListener('change', () => {
+        const sKey = input.getAttribute('data-size-key');
+        const newAddon = parseCleanNumber(input.value);
+        input.value = formatPriceValue(newAddon);
+
+        if (currentProductConfig.sizes && currentProductConfig.sizes[sKey]) {
+          currentProductConfig.sizes[sKey].addPrice = newAddon;
+        }
+
+        // Update child sub-inputs
+        const childInputs = document.querySelectorAll(`.sub-variant-price[data-size-key="${sKey}"]`);
+        childInputs.forEach((subInput) => {
+          const mKey = subInput.getAttribute('data-metal-key');
+          const dKey = subInput.getAttribute('data-diamond-key');
+          const basePrice = currentProductConfig.metals?.[mKey]?.price ?? 260;
+          const dAdd = currentProductConfig.diamonds?.[dKey]?.addPrice ?? 0;
+          const calculatedPrice = basePrice + dAdd + newAddon;
+          subInput.value = formatPriceValue(calculatedPrice);
+          const overrideKey = `${mKey}::${dKey}::${sKey}`;
+          if (!currentProductConfig.variantOverrides) currentProductConfig.variantOverrides = {};
+          currentProductConfig.variantOverrides[overrideKey] = calculatedPrice;
+        });
+      });
+    });
+
+    // Sub-variant individual price input edit
     document.querySelectorAll('.sub-variant-price').forEach((input) => {
       input.addEventListener('change', () => {
         const overrideKey = input.getAttribute('data-override-key');
@@ -648,15 +820,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Save Product & Variants Config Handler
   function saveShopifyProductChanges() {
-    // Harvest values from master group price inputs
-    document.querySelectorAll('.master-group-price').forEach((input) => {
-      const mKey = input.getAttribute('data-metal-key');
-      const val = parseCleanNumber(input.value);
-      if (currentProductConfig.metals && currentProductConfig.metals[mKey]) {
-        currentProductConfig.metals[mKey].price = val;
-      }
-    });
-
     if (!currentProductConfig.variantOverrides) currentProductConfig.variantOverrides = {};
 
     // Metal alias map
@@ -671,15 +834,17 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.sub-variant-price').forEach((input) => {
       const mKey = input.getAttribute('data-metal-key');
       const dKey = input.getAttribute('data-diamond-key');
+      const sKey = input.getAttribute('data-size-key');
       const val = parseCleanNumber(input.value);
 
-      if (mKey && dKey) {
-        currentProductConfig.variantOverrides[`${mKey}::${dKey}`] = val;
+      if (mKey && dKey && sKey) {
+        const main3WayKey = `${mKey}::${dKey}::${sKey}`;
+        currentProductConfig.variantOverrides[main3WayKey] = val;
 
         // Populate alias keys
         if (aliases[mKey]) {
           aliases[mKey].forEach((alias) => {
-            currentProductConfig.variantOverrides[`${alias}::${dKey}`] = val;
+            currentProductConfig.variantOverrides[`${alias}::${dKey}::${sKey}`] = val;
           });
         }
       }
@@ -731,23 +896,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnAddVariantTop) {
     btnAddVariantTop.addEventListener('click', () => {
-      const newOption = prompt('Enter new variant/option name (e.g. 18K Platinum, Custom Cut, etc.):');
-      if (newOption && newOption.trim()) {
-        const optionName = newOption.trim();
-        const baseRate = prompt(`Enter starting base price for "${optionName}" (₹):`, '125000');
-        const numRate = parseCleanNumber(baseRate || '125000');
-
-        currentProductConfig.metals[optionName] = {
-          price: numRate,
-          purity: 'Custom Bespoke Purity',
-          colorName: optionName,
-          swatch: '#a8a29e',
-          img: 'images/wrist_silver.jpg',
-          sku: 'LNK-CUST'
-        };
-
-        renderShopifyVariantsTable();
-        saveShopifyProductChanges();
+      const optionCategory = prompt('Which variation option would you like to add a new choice to?\nType 1 for Metal Selection, 2 for Diamond Selection, 3 for Diamond Size:', '1');
+      if (optionCategory === '1') {
+        const optName = prompt('Enter new Metal Option Name (e.g. Platinum 950, 24K Pure Gold):');
+        if (optName && optName.trim()) {
+          const name = optName.trim();
+          const baseRate = prompt(`Enter starting base price for "${name}" ($):`, '950');
+          const numRate = parseCleanNumber(baseRate || '950');
+          if (!currentProductConfig.metals) currentProductConfig.metals = {};
+          currentProductConfig.metals[name] = {
+            price: numRate,
+            purity: 'Bespoke Purity',
+            colorName: name,
+            swatch: '#94a3b8',
+            img: 'images/wrist_silver.jpg',
+            sku: 'LNK-CUST'
+          };
+          renderShopifyVariantsTable();
+          saveShopifyProductChanges();
+        }
+      } else if (optionCategory === '2') {
+        const optName = prompt('Enter new Diamond Selection Type (e.g. VVS Lab Diamond, Emerald Cut Moissanite):');
+        if (optName && optName.trim()) {
+          const name = optName.trim();
+          const addRate = prompt(`Enter price add-on for "${name}" ($):`, '200');
+          const numRate = parseCleanNumber(addRate || '200');
+          if (!currentProductConfig.diamonds) currentProductConfig.diamonds = {};
+          currentProductConfig.diamonds[name] = {
+            addPrice: numRate,
+            subtitle: 'Bespoke Diamond Selection'
+          };
+          renderShopifyVariantsTable();
+          saveShopifyProductChanges();
+        }
+      } else if (optionCategory === '3') {
+        const optName = prompt('Enter new Diamond Size (e.g. 5 mm, 2.5 mm):');
+        if (optName && optName.trim()) {
+          const name = optName.trim();
+          const addRate = prompt(`Enter price add-on for size "${name}" ($):`, '50');
+          const numRate = parseCleanNumber(addRate || '50');
+          if (!currentProductConfig.sizes) currentProductConfig.sizes = {};
+          currentProductConfig.sizes[name] = {
+            addPrice: numRate
+          };
+          renderShopifyVariantsTable();
+          saveShopifyProductChanges();
+        }
       }
     });
   }
@@ -821,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function formatINR(number) {
-    return '₹' + Math.max(0, Math.round(number)).toLocaleString('en-IN');
+    return '$' + Math.max(0, Math.round(number)).toLocaleString('en-US');
   }
 
   function renderDashboard() {
@@ -912,7 +1106,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
               </div>
             </td>
-            <td style="font-weight: 600; color: var(--text-heading);">${order.total || '₹48,500'}</td>
+            <td style="font-weight: 600; color: var(--text-heading);">${order.total || '$48,500'}</td>
             <td>
               <span class="payment-badge ${order.paymentMethod === 'cod' ? 'cod' : 'online'}">
                 ${order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Razorpay Online'}

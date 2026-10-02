@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     size: '3 mm',
     certificate: 'HRD',
     certificateName: 'HRD Antwerp',
-    price: 48500,
+    price: 260,
     image: 'images/circle_silver.jpg',
     quantity: 1
   };
@@ -26,6 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const saved = localStorage.getItem('dhouse_checkout_item');
     if (saved) {
       const parsed = JSON.parse(saved);
+      if (parsed.price && parsed.price > 5000) {
+        parsed.price = 260;
+      }
       cartItem = { ...defaultProduct, ...parsed };
     }
   } catch (e) {
@@ -64,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalWhatsAppBtn = document.getElementById('modalWhatsAppBtn');
 
   function formatINR(number) {
-    return '₹' + Math.max(0, Math.round(number)).toLocaleString('en-IN');
+    return '$' + Math.max(0, Math.round(number)).toLocaleString('en-US');
   }
 
   // 3. Render Item & Calculation
@@ -173,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const newOrder = {
         orderId: randomOrderNo,
         date: new Date().toISOString(),
-        formattedDate: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }),
+        formattedDate: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }),
         customer: {
           firstName,
           lastName,
