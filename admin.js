@@ -206,6 +206,52 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnAddOptionRow = document.getElementById('btnAddOptionRow');
   const shopifyTotalAvailable = document.getElementById('shopifyTotalAvailable');
 
+  const FIXED_VARIANT_PRICES = {
+    // Silver
+    'Silver::Moissanite::2 mm': 260,
+    'Silver::Moissanite::3 mm': 270,
+    'Silver::Moissanite::4 mm': 280,
+    'Silver::CVD::2 mm': 1380,
+    'Silver::CVD::3 mm': 1480,
+    'Silver::CVD::4 mm': 1580,
+    'Silver::Natural::2 mm': 6680,
+    'Silver::Natural::3 mm': 6980,
+    'Silver::Natural::4 mm': 7280,
+
+    // 9K Gold
+    '9K Gold::Moissanite::2 mm': 1150,
+    '9K Gold::Moissanite::3 mm': 1160,
+    '9K Gold::Moissanite::4 mm': 1170,
+    '9K Gold::CVD::2 mm': 2270,
+    '9K Gold::CVD::3 mm': 2370,
+    '9K Gold::CVD::4 mm': 2470,
+    '9K Gold::Natural::2 mm': 7840,
+    '9K Gold::Natural::3 mm': 8140,
+    '9K Gold::Natural::4 mm': 8440,
+
+    // 14K Gold
+    '14K Gold::Moissanite::2 mm': 1650,
+    '14K Gold::Moissanite::3 mm': 1660,
+    '14K Gold::Moissanite::4 mm': 1670,
+    '14K Gold::CVD::2 mm': 2770,
+    '14K Gold::CVD::3 mm': 2870,
+    '14K Gold::CVD::4 mm': 2970,
+    '14K Gold::Natural::2 mm': 8340,
+    '14K Gold::Natural::3 mm': 8640,
+    '14K Gold::Natural::4 mm': 8940,
+
+    // 18K Gold
+    '18K Gold::Moissanite::2 mm': 2050,
+    '18K Gold::Moissanite::3 mm': 2060,
+    '18K Gold::Moissanite::4 mm': 2070,
+    '18K Gold::CVD::2 mm': 3170,
+    '18K Gold::CVD::3 mm': 3270,
+    '18K Gold::CVD::4 mm': 3370,
+    '18K Gold::Natural::2 mm': 8740,
+    '18K Gold::Natural::3 mm': 9040,
+    '18K Gold::Natural::4 mm': 9340
+  };
+
   const defaultProductConfig = {
     title: 'Luster Bracelet',
     tagline: 'Luster — brilliance that speaks from every angle.',
@@ -217,15 +263,15 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     diamonds: {
       'Moissanite': { addPrice: 0, subtitle: 'Brilliant shine, great value' },
-      'CVD': { addPrice: 150, subtitle: 'Lab grown, identical brilliance' },
-      'Natural': { addPrice: 450, subtitle: 'Rare, authentic, timeless' }
+      'CVD': { addPrice: 1210, subtitle: 'Lab grown, identical brilliance' },
+      'Natural': { addPrice: 6710, subtitle: 'Rare, authentic, timeless' }
     },
     sizes: {
-      '2 mm': { addPrice: -40 },
+      '2 mm': { addPrice: -10 },
       '3 mm': { addPrice: 0 },
-      '4 mm': { addPrice: 80 }
+      '4 mm': { addPrice: 10 }
     },
-    variantOverrides: {}
+    variantOverrides: Object.assign({}, FIXED_VARIANT_PRICES)
   };
 
   let currentProductConfig = JSON.parse(JSON.stringify(defaultProductConfig));
@@ -257,6 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
           localStorage.removeItem('dhouse_variant_prices');
           return JSON.parse(JSON.stringify(defaultProductConfig));
         }
+        parsed.variantOverrides = Object.assign({}, FIXED_VARIANT_PRICES, parsed.variantOverrides || {});
         return Object.assign({}, defaultProductConfig, parsed);
       }
     } catch (e) {
@@ -266,10 +313,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function getCombinationPrice(mKey, dKey, sKey) {
-    const overrides = currentProductConfig.variantOverrides || {};
     const exactKey = `${mKey}::${dKey}::${sKey}`;
+    const overrides = currentProductConfig.variantOverrides || {};
     if (overrides[exactKey] !== undefined) {
       return parseCleanNumber(overrides[exactKey]);
+    }
+    if (FIXED_VARIANT_PRICES[exactKey] !== undefined) {
+      return FIXED_VARIANT_PRICES[exactKey];
     }
     // Check 2-way fallback
     if (overrides[`${mKey}::${dKey}`] !== undefined) {

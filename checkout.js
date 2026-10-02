@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     size: '3 mm',
     certificate: 'HRD',
     certificateName: 'HRD Antwerp',
-    price: 260,
+    price: 270,
     image: 'images/circle_silver.jpg',
     quantity: 1
   };
@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const saved = localStorage.getItem('dhouse_checkout_item');
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (parsed.price && parsed.price > 5000) {
-        parsed.price = 260;
+      if (parsed.price && parsed.price > 15000) {
+        parsed.price = 270;
       }
       cartItem = { ...defaultProduct, ...parsed };
     }

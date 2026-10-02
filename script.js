@@ -162,6 +162,52 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------------------------------------------------------------------------
   // 3. Customizer State & Dynamic Pricing
   // ---------------------------------------------------------------------------
+  const FIXED_VARIANT_PRICES = {
+    // Silver
+    'Silver::Moissanite::2 mm': 260,
+    'Silver::Moissanite::3 mm': 270,
+    'Silver::Moissanite::4 mm': 280,
+    'Silver::CVD::2 mm': 1380,
+    'Silver::CVD::3 mm': 1480,
+    'Silver::CVD::4 mm': 1580,
+    'Silver::Natural::2 mm': 6680,
+    'Silver::Natural::3 mm': 6980,
+    'Silver::Natural::4 mm': 7280,
+
+    // 9K Gold
+    '9K Gold::Moissanite::2 mm': 1150,
+    '9K Gold::Moissanite::3 mm': 1160,
+    '9K Gold::Moissanite::4 mm': 1170,
+    '9K Gold::CVD::2 mm': 2270,
+    '9K Gold::CVD::3 mm': 2370,
+    '9K Gold::CVD::4 mm': 2470,
+    '9K Gold::Natural::2 mm': 7840,
+    '9K Gold::Natural::3 mm': 8140,
+    '9K Gold::Natural::4 mm': 8440,
+
+    // 14K Gold
+    '14K Gold::Moissanite::2 mm': 1650,
+    '14K Gold::Moissanite::3 mm': 1660,
+    '14K Gold::Moissanite::4 mm': 1670,
+    '14K Gold::CVD::2 mm': 2770,
+    '14K Gold::CVD::3 mm': 2870,
+    '14K Gold::CVD::4 mm': 2970,
+    '14K Gold::Natural::2 mm': 8340,
+    '14K Gold::Natural::3 mm': 8640,
+    '14K Gold::Natural::4 mm': 8940,
+
+    // 18K Gold
+    '18K Gold::Moissanite::2 mm': 2050,
+    '18K Gold::Moissanite::3 mm': 2060,
+    '18K Gold::Moissanite::4 mm': 2070,
+    '18K Gold::CVD::2 mm': 3170,
+    '18K Gold::CVD::3 mm': 3270,
+    '18K Gold::CVD::4 mm': 3370,
+    '18K Gold::Natural::2 mm': 8740,
+    '18K Gold::Natural::3 mm': 9040,
+    '18K Gold::Natural::4 mm': 9340
+  };
+
   const currentConfig = {
     metal: {
       name: 'Silver',
@@ -214,51 +260,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const sVal = currentConfig.size.value;
     const cName = currentConfig.color.name;
 
+    const possible3WayKeys = [
+      `${mName}::${dType}::${sVal}`,
+      `${cName}::${dType}::${sVal}`,
+      mName === 'Silver' ? `White Gold::${dType}::${sVal}` : '',
+      mName === '9K Gold' ? `Yellow Gold::${dType}::${sVal}` : '',
+      mName === '14K Gold' ? `Rose Gold::${dType}::${sVal}` : '',
+      mName === '18K Gold' ? `Dark Rose Gold::${dType}::${sVal}` : '',
+      cName === 'White' ? `White Gold::${dType}::${sVal}` : '',
+      cName === 'White' ? `Silver::${dType}::${sVal}` : '',
+      cName === 'Light Rose Gold' ? `Rose Gold::${dType}::${sVal}` : '',
+      cName === 'Dark Rose Gold' ? `18K Gold::${dType}::${sVal}` : ''
+    ].filter(Boolean);
+
+    // 1. Check custom overrides from localStorage if present
     try {
       const raw = localStorage.getItem('dhouse_product_config');
       if (raw) {
         const pConfig = JSON.parse(raw);
         if (pConfig.variantOverrides) {
-          const possible3WayKeys = [
-            `${mName}::${dType}::${sVal}`,
-            `${cName}::${dType}::${sVal}`,
-            mName === 'Silver' ? `White Gold::${dType}::${sVal}` : '',
-            mName === '9K Gold' ? `Yellow Gold::${dType}::${sVal}` : '',
-            mName === '14K Gold' ? `Rose Gold::${dType}::${sVal}` : '',
-            mName === '18K Gold' ? `Dark Rose Gold::${dType}::${sVal}` : '',
-            cName === 'White' ? `White Gold::${dType}::${sVal}` : '',
-            cName === 'White' ? `Silver::${dType}::${sVal}` : '',
-            cName === 'Light Rose Gold' ? `Rose Gold::${dType}::${sVal}` : '',
-            cName === 'Dark Rose Gold' ? `18K Gold::${dType}::${sVal}` : ''
-          ].filter(Boolean);
-
           for (const key of possible3WayKeys) {
             if (pConfig.variantOverrides[key] !== undefined) {
               finalPrice = parseCleanPrice(pConfig.variantOverrides[key]);
               break;
-            }
-          }
-
-          // Fallback to 2-way if 3-way not explicitly present
-          if (finalPrice === null) {
-            const possible2WayKeys = [
-              `${mName}::${dType}`,
-              `${cName}::${dType}`,
-              mName === 'Silver' ? `White Gold::${dType}` : '',
-              mName === '9K Gold' ? `Yellow Gold::${dType}` : '',
-              mName === '14K Gold' ? `Rose Gold::${dType}` : '',
-              mName === '18K Gold' ? `Dark Rose Gold::${dType}` : '',
-              cName === 'White' ? `White Gold::${dType}` : '',
-              cName === 'White' ? `Silver::${dType}` : '',
-              cName === 'Light Rose Gold' ? `Rose Gold::${dType}` : '',
-              cName === 'Dark Rose Gold' ? `18K Gold::${dType}` : ''
-            ].filter(Boolean);
-
-            for (const key of possible2WayKeys) {
-              if (pConfig.variantOverrides[key] !== undefined) {
-                finalPrice = parseCleanPrice(pConfig.variantOverrides[key]) + currentConfig.size.addPrice;
-                break;
-              }
             }
           }
         }
@@ -267,6 +291,17 @@ document.addEventListener('DOMContentLoaded', () => {
       console.warn(e);
     }
 
+    // 2. Lookup embedded fixed price table
+    if (finalPrice === null) {
+      for (const key of possible3WayKeys) {
+        if (FIXED_VARIANT_PRICES[key] !== undefined) {
+          finalPrice = FIXED_VARIANT_PRICES[key];
+          break;
+        }
+      }
+    }
+
+    // 3. Fallback to basic formula
     if (finalPrice === null) {
       finalPrice = currentConfig.metal.basePrice + currentConfig.diamond.addPrice + currentConfig.size.addPrice;
     }
