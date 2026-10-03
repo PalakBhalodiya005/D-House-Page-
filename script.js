@@ -169,7 +169,8 @@ document.addEventListener('DOMContentLoaded', () => {
       basePrice: 48500
     },
     braceletSize: {
-      value: '7” (17.8 cm)'
+      value: '7” (17.8 cm)',
+      addPrice: 0
     },
     diamond: {
       type: 'Moissanite',
@@ -198,11 +199,15 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderConfig() {
     const totalPrice =
       currentConfig.metal.basePrice +
+      (currentConfig.braceletSize.addPrice || 0) +
       currentConfig.diamond.addPrice +
       currentConfig.size.addPrice;
 
     if (priceDisplay) {
       priceDisplay.textContent = formatINR(totalPrice);
+      priceDisplay.classList.remove('price-update-pop');
+      void priceDisplay.offsetWidth; // Force DOM reflow to retrigger animation
+      priceDisplay.classList.add('price-update-pop');
     }
 
     if (specSummaryText) {
@@ -296,10 +301,73 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Bracelet Size Selection Handler
-  setupSelectionGroup('#braceletSizeGrid', (card) => {
-    currentConfig.braceletSize.value = card.getAttribute('data-value');
-  });
+  // ---------------------------------------------------------------------------
+  // Luxury Bracelet Size Dropdown Handler & Dynamic Price Update
+  // ---------------------------------------------------------------------------
+  const braceletSizeDropdown = document.getElementById('braceletSizeDropdown');
+  const sizeDropdownTrigger = document.getElementById('sizeDropdownTrigger');
+  const sizeDropdownMenu = document.getElementById('sizeDropdownMenu');
+  const triggerSizeBadge = document.getElementById('triggerSizeBadge');
+  const triggerSelectedText = document.getElementById('triggerSelectedText');
+
+  if (sizeDropdownTrigger && braceletSizeDropdown) {
+    // Toggle dropdown
+    sizeDropdownTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = braceletSizeDropdown.classList.toggle('open');
+      sizeDropdownTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!braceletSizeDropdown.contains(e.target)) {
+        braceletSizeDropdown.classList.remove('open');
+        sizeDropdownTrigger.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && braceletSizeDropdown.classList.contains('open')) {
+        braceletSizeDropdown.classList.remove('open');
+        sizeDropdownTrigger.setAttribute('aria-expanded', 'false');
+        sizeDropdownTrigger.focus();
+      }
+    });
+
+    // Option item click
+    const dropdownItems = braceletSizeDropdown.querySelectorAll('.luxury-dropdown-item');
+    dropdownItems.forEach((item) => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownItems.forEach((it) => {
+          it.classList.remove('active');
+          it.setAttribute('aria-selected', 'false');
+        });
+        item.classList.add('active');
+        item.setAttribute('aria-selected', 'true');
+
+        const val = item.getAttribute('data-value');
+        const size = item.getAttribute('data-size');
+        const addPrice = parseInt(item.getAttribute('data-addprice'), 10) || 0;
+
+        // Update trigger UI
+        if (triggerSizeBadge) triggerSizeBadge.textContent = size;
+        if (triggerSelectedText) triggerSelectedText.textContent = val;
+
+        // Update config state with size and dynamic price addition
+        currentConfig.braceletSize.value = val;
+        currentConfig.braceletSize.addPrice = addPrice;
+
+        // Close dropdown
+        braceletSizeDropdown.classList.remove('open');
+        sizeDropdownTrigger.setAttribute('aria-expanded', 'false');
+
+        // Immediately update main price tag and specs display
+        renderConfig();
+      });
+    });
+  }
 
   // Diamond Type Selection Handler
   setupSelectionGroup('#diamondGrid', (card) => {
@@ -344,6 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveAndDirectCheckout() {
     const totalPrice =
       currentConfig.metal.basePrice +
+      (currentConfig.braceletSize.addPrice || 0) +
       currentConfig.diamond.addPrice +
       currentConfig.size.addPrice;
 
@@ -357,6 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
       metal: currentConfig.metal.name,
       purity: currentConfig.metal.purity,
       color: currentConfig.color.name,
+      braceletSize: currentConfig.braceletSize.value,
       diamond: currentConfig.diamond.type,
       size: currentConfig.size.value,
       certificate: currentConfig.certificate.code,

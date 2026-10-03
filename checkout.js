@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const summaryImg = document.getElementById('summaryImg');
   const summaryTitle = document.getElementById('summaryTitle');
   const specTagMetal = document.getElementById('specTagMetal');
+  const specTagBraceletSize = document.getElementById('specTagBraceletSize');
   const specTagDiamond = document.getElementById('specTagDiamond');
   const specTagSize = document.getElementById('specTagSize');
   const specTagColor = document.getElementById('specTagColor');
@@ -72,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (summaryImg) summaryImg.src = cartItem.image;
     if (summaryTitle) summaryTitle.textContent = cartItem.title;
     if (specTagMetal) specTagMetal.textContent = `${cartItem.metal} (${cartItem.purity})`;
+    if (specTagBraceletSize && cartItem.braceletSize) specTagBraceletSize.textContent = `Length: ${cartItem.braceletSize}`;
     if (specTagDiamond) specTagDiamond.textContent = cartItem.diamond;
     if (specTagSize) specTagSize.textContent = `Size: ${cartItem.size}`;
     if (specTagColor) specTagColor.textContent = cartItem.color;
@@ -241,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Configure WhatsApp order confirmation button
       if (modalWhatsAppBtn) {
         const waText = encodeURIComponent(
-          `Hello D'House Jewels! I just placed Order ${randomOrderNo} for ${cartItem.title}:\n- Configuration: ${cartItem.metal} (${cartItem.purity}) | ${cartItem.color} | ${cartItem.diamond} | ${cartItem.size}\n- Quantity: ${cartItem.quantity}\n- Total: ${calculatedTotal}\n- Ship To: ${firstName} ${lastName}, ${address}, ${city}, ${state} - ${pincode}`
+          `Hello D'House Jewels! I just placed Order ${randomOrderNo} for ${cartItem.title}:\n- Configuration: ${cartItem.metal} (${cartItem.purity}) | Length: ${cartItem.braceletSize || '7” (17.8 cm)'} | ${cartItem.color} | ${cartItem.diamond} | ${cartItem.size}\n- Quantity: ${cartItem.quantity}\n- Total: ${calculatedTotal}\n- Ship To: ${firstName} ${lastName}, ${address}, ${city}, ${state} - ${pincode}`
         );
         modalWhatsAppBtn.href = `https://api.whatsapp.com/send?phone=${getWhatsAppNumber()}&text=${waText}`;
       }

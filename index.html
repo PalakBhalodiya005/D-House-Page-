@@ -21,7 +21,6 @@
     <div class="header-container">
       <!-- Brand Logo -->
       <a href="#" class="brand-logo-wrap">
-        <img src="images/logo.svg" alt="D'House Jewels Logo" class="brand-logo-img">
         <div class="brand-text-wrap">
           <span class="brand-title">D'HOUSE JEWELS</span>
           <div class="brand-sub">
@@ -220,90 +219,80 @@
             </div>
           </div>
 
-          <div class="cards-grid grid-4-cols" id="braceletSizeGrid">
-            <!-- 5” (12.7 cm) -->
-            <button class="choice-card bracelet-size-card" data-type="braceletSize" data-value="5” (12.7 cm)" aria-selected="false">
-              <span class="radio-indicator"></span>
-              <span class="size-title">5”</span>
-              <span class="size-cm">12.7 cm</span>
+          <!-- Luxury Custom Dropdown Container -->
+          <div class="luxury-dropdown-container" id="braceletSizeDropdown">
+            <button type="button" class="luxury-dropdown-trigger" id="sizeDropdownTrigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="sizeDropdownMenu">
+              <div class="trigger-selected-wrap">
+                <span class="trigger-size-badge" id="triggerSizeBadge">7”</span>
+                <span class="trigger-main-text" id="triggerSelectedText">7” (17.8 cm)</span>
+              </div>
+              <svg class="dropdown-chevron-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
             </button>
 
-            <!-- 5.5” (14 cm) -->
-            <button class="choice-card bracelet-size-card" data-type="braceletSize" data-value="5.5” (14 cm)" aria-selected="false">
-              <span class="radio-indicator"></span>
-              <span class="size-title">5.5”</span>
-              <span class="size-cm">14 cm</span>
-            </button>
+            <!-- Dropdown Menu / Listbox -->
+            <div class="luxury-dropdown-menu" id="sizeDropdownMenu" role="listbox" aria-label="Available Sizes">
+              <div class="luxury-dropdown-item" data-value="5” (12.7 cm)" data-size="5”" data-addprice="-4000" role="option" aria-selected="false">
+                <span class="dropdown-radio"></span>
+                <span class="item-size-val">5” <span class="item-cm-val">(12.7 cm)</span></span>
+              </div>
 
-            <!-- 6” (15.2 cm) -->
-            <button class="choice-card bracelet-size-card" data-type="braceletSize" data-value="6” (15.2 cm)" aria-selected="false">
-              <span class="radio-indicator"></span>
-              <span class="size-title">6”</span>
-              <span class="size-cm">15.2 cm</span>
-            </button>
+              <div class="luxury-dropdown-item" data-value="5.5” (14 cm)" data-size="5.5”" data-addprice="-3000" role="option" aria-selected="false">
+                <span class="dropdown-radio"></span>
+                <span class="item-size-val">5.5” <span class="item-cm-val">(14 cm)</span></span>
+              </div>
 
-            <!-- 6.5” (16.5 cm) -->
-            <button class="choice-card bracelet-size-card" data-type="braceletSize" data-value="6.5” (16.5 cm)" aria-selected="false">
-              <span class="radio-indicator"></span>
-              <span class="size-title">6.5”</span>
-              <span class="size-cm">16.5 cm</span>
-            </button>
+              <div class="luxury-dropdown-item" data-value="6” (15.2 cm)" data-size="6”" data-addprice="-2000" role="option" aria-selected="false">
+                <span class="dropdown-radio"></span>
+                <span class="item-size-val">6” <span class="item-cm-val">(15.2 cm)</span></span>
+              </div>
 
-            <!-- 7” (17.8 cm) - Default Active -->
-            <button class="choice-card bracelet-size-card active" data-type="braceletSize" data-value="7” (17.8 cm)" aria-selected="true">
-              <span class="radio-indicator"></span>
-              <span class="size-title">7”</span>
-              <span class="size-cm">17.8 cm</span>
-            </button>
+              <div class="luxury-dropdown-item" data-value="6.5” (16.5 cm)" data-size="6.5”" data-addprice="-1000" role="option" aria-selected="false">
+                <span class="dropdown-radio"></span>
+                <span class="item-size-val">6.5” <span class="item-cm-val">(16.5 cm)</span></span>
+              </div>
 
-            <!-- 7.5” (19.1 cm) -->
-            <button class="choice-card bracelet-size-card" data-type="braceletSize" data-value="7.5” (19.1 cm)" aria-selected="false">
-              <span class="radio-indicator"></span>
-              <span class="size-title">7.5”</span>
-              <span class="size-cm">19.1 cm</span>
-            </button>
+              <div class="luxury-dropdown-item active" data-value="7” (17.8 cm)" data-size="7”" data-addprice="0" role="option" aria-selected="true">
+                <span class="dropdown-radio"></span>
+                <span class="item-size-val">7” <span class="item-cm-val">(17.8 cm)</span></span>
+              </div>
 
-            <!-- 8” (20.3 cm) -->
-            <button class="choice-card bracelet-size-card" data-type="braceletSize" data-value="8” (20.3 cm)" aria-selected="false">
-              <span class="radio-indicator"></span>
-              <span class="size-title">8”</span>
-              <span class="size-cm">20.3 cm</span>
-            </button>
+              <div class="luxury-dropdown-item" data-value="7.5” (19.1 cm)" data-size="7.5”" data-addprice="1500" role="option" aria-selected="false">
+                <span class="dropdown-radio"></span>
+                <span class="item-size-val">7.5” <span class="item-cm-val">(19.1 cm)</span></span>
+              </div>
 
-            <!-- 8.5” (21.6 cm) -->
-            <button class="choice-card bracelet-size-card" data-type="braceletSize" data-value="8.5” (21.6 cm)" aria-selected="false">
-              <span class="radio-indicator"></span>
-              <span class="size-title">8.5”</span>
-              <span class="size-cm">21.6 cm</span>
-            </button>
+              <div class="luxury-dropdown-item" data-value="8” (20.3 cm)" data-size="8”" data-addprice="3000" role="option" aria-selected="false">
+                <span class="dropdown-radio"></span>
+                <span class="item-size-val">8” <span class="item-cm-val">(20.3 cm)</span></span>
+              </div>
 
-            <!-- 9” (22.9 cm) -->
-            <button class="choice-card bracelet-size-card" data-type="braceletSize" data-value="9” (22.9 cm)" aria-selected="false">
-              <span class="radio-indicator"></span>
-              <span class="size-title">9”</span>
-              <span class="size-cm">22.9 cm</span>
-            </button>
+              <div class="luxury-dropdown-item" data-value="8.5” (21.6 cm)" data-size="8.5”" data-addprice="4500" role="option" aria-selected="false">
+                <span class="dropdown-radio"></span>
+                <span class="item-size-val">8.5” <span class="item-cm-val">(21.6 cm)</span></span>
+              </div>
 
-            <!-- 9.5” (24.1 cm) -->
-            <button class="choice-card bracelet-size-card" data-type="braceletSize" data-value="9.5” (24.1 cm)" aria-selected="false">
-              <span class="radio-indicator"></span>
-              <span class="size-title">9.5”</span>
-              <span class="size-cm">24.1 cm</span>
-            </button>
+              <div class="luxury-dropdown-item" data-value="9” (22.9 cm)" data-size="9”" data-addprice="6000" role="option" aria-selected="false">
+                <span class="dropdown-radio"></span>
+                <span class="item-size-val">9” <span class="item-cm-val">(22.9 cm)</span></span>
+              </div>
 
-            <!-- 10” (25.4 cm) -->
-            <button class="choice-card bracelet-size-card" data-type="braceletSize" data-value="10” (25.4 cm)" aria-selected="false">
-              <span class="radio-indicator"></span>
-              <span class="size-title">10”</span>
-              <span class="size-cm">25.4 cm</span>
-            </button>
+              <div class="luxury-dropdown-item" data-value="9.5” (24.1 cm)" data-size="9.5”" data-addprice="7500" role="option" aria-selected="false">
+                <span class="dropdown-radio"></span>
+                <span class="item-size-val">9.5” <span class="item-cm-val">(24.1 cm)</span></span>
+              </div>
 
-            <!-- 10.5” (26.7 cm) -->
-            <button class="choice-card bracelet-size-card" data-type="braceletSize" data-value="10.5” (26.7 cm)" aria-selected="false">
-              <span class="radio-indicator"></span>
-              <span class="size-title">10.5”</span>
-              <span class="size-cm">26.7 cm</span>
-            </button>
+              <div class="luxury-dropdown-item" data-value="10” (25.4 cm)" data-size="10”" data-addprice="9000" role="option" aria-selected="false">
+                <span class="dropdown-radio"></span>
+                <span class="item-size-val">10” <span class="item-cm-val">(25.4 cm)</span></span>
+              </div>
+
+              <div class="luxury-dropdown-item" data-value="10.5” (26.7 cm)" data-size="10.5”" data-addprice="10500" role="option" aria-selected="false">
+                <span class="dropdown-radio"></span>
+                <span class="item-size-val">10.5” <span class="item-cm-val">(26.7 cm)</span></span>
+              </div>
+            </div>
           </div>
         </div>
 

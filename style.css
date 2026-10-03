@@ -729,7 +729,18 @@ img {
   font-weight: 700;
   color: #1a120e;
   letter-spacing: -0.2px;
-  transition: color 0.2s ease;
+  display: inline-block;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+@keyframes pricePop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.05); color: var(--primary-burgundy); }
+  100% { transform: scale(1); color: #1a120e; }
+}
+
+.price-update-pop {
+  animation: pricePop 0.28s ease-out;
 }
 
 .approx-tag {
@@ -1015,33 +1026,198 @@ img {
 }
 
 /* ==========================================================================
-   AVAILABLE BRACELET SIZES CARDS
+   AVAILABLE BRACELET SIZES LUXURY DROPDOWN
    ========================================================================== */
-.bracelet-size-card {
-  padding: 13px 4px 11px;
+.luxury-dropdown-container {
+  position: relative;
   width: 100%;
-  min-width: 0;
   box-sizing: border-box;
 }
 
-.bracelet-size-card .size-title {
+.luxury-dropdown-trigger {
+  width: 100%;
+  min-height: 54px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: var(--shadow-subtle);
+  transition: var(--transition);
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.luxury-dropdown-trigger:hover {
+  border-color: #bdaea0;
+  box-shadow: var(--shadow-hover);
+  background-color: #ffffff;
+}
+
+.luxury-dropdown-container.open .luxury-dropdown-trigger {
+  border-color: var(--primary-burgundy);
+  box-shadow: 0 0 0 3px rgba(158, 9, 17, 0.08);
+  background-color: #ffffff;
+}
+
+.trigger-selected-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.trigger-size-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(158, 9, 17, 0.07);
+  color: var(--primary-burgundy);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 13.5px;
+  flex-shrink: 0;
+  border: 1px solid rgba(158, 9, 17, 0.18);
+}
+
+.trigger-main-text {
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #241613;
+  line-height: 1.25;
+}
+
+.dropdown-chevron-icon {
+  stroke: #6b5c53;
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+
+.luxury-dropdown-container.open .dropdown-chevron-icon {
+  transform: rotate(180deg);
+  stroke: var(--primary-burgundy);
+}
+
+/* Dropdown Menu Panel */
+.luxury-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  max-height: 290px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border: 1px solid #e4dad0;
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 30px rgba(43, 31, 26, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+  z-index: 70;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+  padding: 6px;
+}
+
+.luxury-dropdown-container.open .luxury-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Custom Scrollbar */
+.luxury-dropdown-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.luxury-dropdown-menu::-webkit-scrollbar-track {
+  background: #faf6f1;
+  border-radius: 4px;
+}
+
+.luxury-dropdown-menu::-webkit-scrollbar-thumb {
+  background: #d8cbbf;
+  border-radius: 4px;
+}
+
+.luxury-dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: #b5a598;
+}
+
+/* Dropdown Items */
+.luxury-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.16s ease;
+  margin-bottom: 2px;
+}
+
+.luxury-dropdown-item:last-child {
+  margin-bottom: 0;
+}
+
+.luxury-dropdown-item:hover {
+  background-color: rgba(158, 9, 17, 0.05);
+}
+
+.luxury-dropdown-item.active {
+  background-color: #fdf5f5;
+  border-left: 3px solid var(--primary-burgundy);
+  padding-left: 11px;
+}
+
+.dropdown-radio {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.5px solid #c7b8ac;
+  display: inline-block;
+  position: relative;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+
+.luxury-dropdown-item.active .dropdown-radio {
+  border-color: var(--primary-burgundy);
+  background-color: #ffffff;
+}
+
+.luxury-dropdown-item.active .dropdown-radio::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--primary-burgundy);
+  transform: translate(-50%, -50%);
+}
+
+.item-size-val {
+  font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 600;
   color: #241613;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
-.bracelet-size-card .size-cm {
-  font-size: 10.5px;
+.item-cm-val {
+  font-weight: 400;
   color: #7b6d65;
-  margin-top: 3px;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-.bracelet-size-card.active .size-cm {
-  color: var(--primary-burgundy);
-  font-weight: 500;
+  font-size: 12.5px;
 }
 
 /* ==========================================================================
@@ -1158,6 +1334,8 @@ img {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-subtle);
   align-items: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .product-feature-item {
@@ -1408,6 +1586,8 @@ img {
     display: flex;
     flex-direction: column;
     gap: 0;
+    align-items: stretch;
+    width: 100%;
   }
 
   .gallery-column,
@@ -1425,7 +1605,8 @@ img {
     order: 1;
     font-size: 32px;
     margin-bottom: 14px;
-    text-align: left;
+    text-align: center;
+    width: 100%;
   }
 
   .main-slider-card {
@@ -1479,6 +1660,11 @@ img {
 
   .product-features-row {
     order: 12;
+    width: 100%;
+    max-width: 480px;
+    margin: 20px auto 16px;
+    align-self: center;
+    box-sizing: border-box;
   }
 
   .selected-spec-pill {
@@ -1590,22 +1776,33 @@ img {
     gap: 8px;
   }
 
-  #braceletSizeGrid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 6px;
+  .luxury-dropdown-trigger {
+    min-height: 48px;
+    padding: 8px 12px;
+    gap: 8px;
   }
 
-  .bracelet-size-card {
-    padding: 10px 2px 8px;
+  .trigger-size-badge {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
   }
 
-  .bracelet-size-card .size-title {
+  .trigger-main-text {
+    font-size: 13.5px;
+  }
+
+  .luxury-dropdown-item {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+
+  .item-size-val {
     font-size: 13px;
   }
 
-  .bracelet-size-card .size-cm {
-    font-size: 8.5px;
-    margin-top: 2px;
+  .item-cm-val {
+    font-size: 11.5px;
   }
 
   #metalSpheresGrid .choice-card {
@@ -1643,10 +1840,17 @@ img {
 
   .product-features-row {
     grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-    padding: 12px 6px;
-    margin-top: 18px;
+    column-gap: 14px;
+    row-gap: 10px;
+    padding: 14px 12px;
+    margin-top: 20px;
     margin-bottom: 16px;
+    width: 100%;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+    align-self: center;
   }
 
   .product-feature-item {
@@ -1654,21 +1858,30 @@ img {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 5px;
+    gap: 6px;
+    min-width: 0;
   }
 
   .feature-icon-wrap {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  .feature-icon-wrap svg {
     width: 24px;
     height: 24px;
   }
 
-  .feature-icon-wrap svg {
-    width: 23px;
-    height: 23px;
-  }
-
   .feature-text-wrap {
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    text-align: center;
+    width: 100%;
   }
 
   .feature-title {
@@ -1743,8 +1956,15 @@ img {
 
   .product-features-row {
     grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    padding: 10px 4px;
+    column-gap: 8px;
+    row-gap: 6px;
+    padding: 10px 8px;
+    width: 100%;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+    align-self: center;
   }
 
   .feature-title {
