@@ -62,12 +62,25 @@ document.addEventListener('DOMContentLoaded', () => {
     'Dark Rose Gold': '18K Gold'
   };
 
-  // Current active gallery set (defaults to Silver)
-  let currentMetal = 'Silver';
-  let galleryImages = [...metalGallerySets['Silver']];
-  let currentSlideIndex = 0;
-  const totalSlides = galleryImages.length;
+  // ---------------------------------------------------------------------------
+  // Product Showcase Videos (M1.mp4 to M8.mp4) - Voice Muted
+  // ---------------------------------------------------------------------------
+  const productVideos = [
+    'images/M1.mp4',
+    'images/M2.mp4',
+    'images/M3.mp4',
+    'images/M4.mp4',
+    'images/M5.mp4',
+    'images/M6.mp4',
+    'images/M7.mp4',
+    'images/M8.mp4'
+  ];
 
+  let currentMetal = 'Silver';
+  let currentSlideIndex = 0;
+  const totalSlides = productVideos.length;
+
+  const mainDisplayVideo = document.getElementById('mainDisplayVideo');
   const mainDisplayImg = document.getElementById('mainDisplayImg');
   const prevSlideBtn = document.getElementById('prevSlideBtn');
   const nextSlideBtn = document.getElementById('nextSlideBtn');
@@ -79,26 +92,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (totalSlidesNum) totalSlidesNum.textContent = totalSlides;
 
+  // Ensure main video is strictly muted (voice muted as requested)
+  if (mainDisplayVideo) {
+    mainDisplayVideo.muted = true;
+    mainDisplayVideo.defaultMuted = true;
+    mainDisplayVideo.volume = 0;
+  }
+
   // ---------------------------------------------------------------------------
-  // 2. Gallery Slider Controls
+  // 2. Gallery Video Slider Controls (Voice Muted)
   // ---------------------------------------------------------------------------
   function updateGalleryDisplay(index, immediate = false) {
     if (index < 0) index = totalSlides - 1;
     if (index >= totalSlides) index = 0;
     currentSlideIndex = index;
+    const targetVideoSrc = productVideos[currentSlideIndex];
 
-    if (immediate) {
-      if (mainDisplayImg) mainDisplayImg.src = galleryImages[currentSlideIndex];
-    } else {
-      if (mainDisplayImg) {
-        mainDisplayImg.style.opacity = '0.35';
-        mainDisplayImg.style.transform = 'scale(0.98)';
+    if (mainDisplayVideo) {
+      if (immediate) {
+        if (!mainDisplayVideo.src.endsWith(targetVideoSrc)) {
+          mainDisplayVideo.src = targetVideoSrc;
+        }
+        mainDisplayVideo.muted = true;
+        mainDisplayVideo.defaultMuted = true;
+        mainDisplayVideo.volume = 0;
+        mainDisplayVideo.currentTime = 0;
+        const playPromise = mainDisplayVideo.play();
+        if (playPromise !== undefined) playPromise.catch(() => {});
+      } else {
+        mainDisplayVideo.style.opacity = '0.35';
+        mainDisplayVideo.style.transform = 'scale(0.98)';
         setTimeout(() => {
-          mainDisplayImg.src = galleryImages[currentSlideIndex];
-          mainDisplayImg.style.opacity = '1';
-          mainDisplayImg.style.transform = 'scale(1)';
+          mainDisplayVideo.src = targetVideoSrc;
+          mainDisplayVideo.muted = true;
+          mainDisplayVideo.defaultMuted = true;
+          mainDisplayVideo.volume = 0;
+          mainDisplayVideo.currentTime = 0;
+          const playPromise = mainDisplayVideo.play();
+          if (playPromise !== undefined) playPromise.catch(() => {});
+          mainDisplayVideo.style.opacity = '1';
+          mainDisplayVideo.style.transform = 'scale(1)';
         }, 120);
       }
+    } else if (mainDisplayImg) {
+      mainDisplayImg.src = targetVideoSrc;
     }
 
     // Update Counter & Progress Bar
@@ -108,28 +145,19 @@ document.addEventListener('DOMContentLoaded', () => {
       indicatorFill.style.width = `${percentage}%`;
     }
 
-    // Update Active Thumbnail Border
+    // Update Active Thumbnail Border & scroll into view on mobile
     thumbnailItems.forEach((thumb, i) => {
-      thumb.classList.toggle('active', i === currentSlideIndex);
+      const isActive = i === currentSlideIndex;
+      thumb.classList.toggle('active', isActive);
+      if (isActive && thumb.scrollIntoView && window.innerWidth <= 600) {
+        thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
     });
   }
 
   // Update gallery images and thumbnails when metal changes
   function updateMetalGallery(metalName) {
-    if (!metalGallerySets[metalName]) return;
     currentMetal = metalName;
-    galleryImages = [...metalGallerySets[metalName]];
-
-    // Update thumbnail strip image sources
-    galleryImages.forEach((imgSrc, i) => {
-      const thumbImg = document.getElementById(`thumbImg${i}`);
-      if (thumbImg) {
-        thumbImg.src = imgSrc;
-      }
-    });
-
-    // Update main display image
-    updateGalleryDisplay(currentSlideIndex, false);
 
     // Update config spec pill thumbnail
     if (specThumbImg && metalConfigThumbs[metalName]) {
@@ -157,7 +185,51 @@ document.addEventListener('DOMContentLoaded', () => {
       const index = parseInt(thumb.getAttribute('data-index'), 10);
       updateGalleryDisplay(index);
     });
+
+    // Silent preview on thumbnail hover for desktop
+    thumb.addEventListener('mouseenter', () => {
+      const v = thumb.querySelector('.thumb-video');
+      if (v) {
+        v.muted = true;
+        v.defaultMuted = true;
+        v.volume = 0;
+        v.currentTime = 0;
+        const p = v.play();
+        if (p !== undefined) p.catch(() => {});
+      }
+    });
+
+    thumb.addEventListener('mouseleave', () => {
+      const v = thumb.querySelector('.thumb-video');
+      if (v) {
+        v.pause();
+        v.currentTime = 0.1;
+      }
+    });
   });
+
+  // Ensure all thumbnail videos are strictly voice muted & paint initial frame
+  document.querySelectorAll('.thumb-video').forEach((v) => {
+    v.muted = true;
+    v.defaultMuted = true;
+    v.volume = 0;
+    v.addEventListener('loadedmetadata', () => {
+      v.currentTime = 0.1;
+    });
+  });
+
+  // Main video click to pause/play (always strictly muted)
+  if (mainDisplayVideo) {
+    mainDisplayVideo.addEventListener('click', () => {
+      if (mainDisplayVideo.paused) {
+        mainDisplayVideo.muted = true;
+        mainDisplayVideo.volume = 0;
+        mainDisplayVideo.play().catch(() => {});
+      } else {
+        mainDisplayVideo.pause();
+      }
+    });
+  }
 
   // ---------------------------------------------------------------------------
   // 3. Customizer State & Dynamic Pricing
@@ -618,10 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
       currentConfig.diamond.addPrice +
       currentConfig.size.addPrice;
 
-    let selectedImg = metalConfigThumbs[currentMetal] || 'images/circle_silver.jpg';
-    if (galleryImages && galleryImages.length > 0 && galleryImages[currentSlideIndex]) {
-      selectedImg = galleryImages[currentSlideIndex];
-    }
+    const selectedImg = metalConfigThumbs[currentMetal] || 'images/circle_silver.jpg';
 
     const checkoutItem = {
       title: 'Luster Bracelet',
@@ -695,7 +764,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const savedWa = localStorage.getItem('dhouse_whatsapp_number');
       const phoneNumber = (savedWa && savedWa.trim()) ? savedWa.trim().replace(/[^0-9]/g, '') : '919898948986';
       const text = encodeURIComponent(
-        `Hi D'House Jewels! I would like to inquire about the Luster Bracelet:\n- Metal: ${currentConfig.metal.name} (${currentConfig.metal.purity})\n- Bracelet Size: ${currentConfig.braceletSize.value}\n- Color: ${currentConfig.color.name}\n- Diamond: ${currentConfig.diamond.type}\n- Diamond Size: ${currentConfig.size.value}\n- Certificate: ${currentConfig.certificate.code}\n- Price: $${priceDisplay ? priceDisplay.textContent : '48,500'}`
+        `Hi D'House Jewels! I would like to inquire about the Luster Bracelet:\n- Metal: ${currentConfig.metal.name} (${currentConfig.metal.purity})\n- Bracelet Size: ${currentConfig.braceletSize.value}\n- Color: ${currentConfig.color.name}\n- Diamond: ${currentConfig.diamond.type}\n- Diamond Size: ${currentConfig.size.value}\n- Certificate: ${currentConfig.certificate.code}\n- Price: $${priceDisplay ? priceDisplay.textContent : '260'}`
       );
       window.open(`https://api.whatsapp.com/send?phone=${phoneNumber || '919898948986'}&text=${text}`, '_blank');
     });
@@ -703,5 +772,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize display
   updateMetalGallery('Silver');
+  updateGalleryDisplay(0, true);
   renderConfig();
 });
