@@ -162,11 +162,57 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------------------------------------------------------------------------
   // 3. Customizer State & Dynamic Pricing
   // ---------------------------------------------------------------------------
+  const FIXED_VARIANT_PRICES = {
+    // Silver
+    'Silver::Moissanite::2 mm': 260,
+    'Silver::Moissanite::3 mm': 270,
+    'Silver::Moissanite::4 mm': 280,
+    'Silver::CVD::2 mm': 1380,
+    'Silver::CVD::3 mm': 1480,
+    'Silver::CVD::4 mm': 1580,
+    'Silver::Natural::2 mm': 6680,
+    'Silver::Natural::3 mm': 6980,
+    'Silver::Natural::4 mm': 7280,
+
+    // 9K Gold
+    '9K Gold::Moissanite::2 mm': 1150,
+    '9K Gold::Moissanite::3 mm': 1160,
+    '9K Gold::Moissanite::4 mm': 1170,
+    '9K Gold::CVD::2 mm': 2270,
+    '9K Gold::CVD::3 mm': 2370,
+    '9K Gold::CVD::4 mm': 2470,
+    '9K Gold::Natural::2 mm': 7840,
+    '9K Gold::Natural::3 mm': 8140,
+    '9K Gold::Natural::4 mm': 8440,
+
+    // 14K Gold
+    '14K Gold::Moissanite::2 mm': 1650,
+    '14K Gold::Moissanite::3 mm': 1660,
+    '14K Gold::Moissanite::4 mm': 1670,
+    '14K Gold::CVD::2 mm': 2770,
+    '14K Gold::CVD::3 mm': 2870,
+    '14K Gold::CVD::4 mm': 2970,
+    '14K Gold::Natural::2 mm': 8340,
+    '14K Gold::Natural::3 mm': 8640,
+    '14K Gold::Natural::4 mm': 8940,
+
+    // 18K Gold
+    '18K Gold::Moissanite::2 mm': 2050,
+    '18K Gold::Moissanite::3 mm': 2060,
+    '18K Gold::Moissanite::4 mm': 2070,
+    '18K Gold::CVD::2 mm': 3170,
+    '18K Gold::CVD::3 mm': 3270,
+    '18K Gold::CVD::4 mm': 3370,
+    '18K Gold::Natural::2 mm': 8740,
+    '18K Gold::Natural::3 mm': 9040,
+    '18K Gold::Natural::4 mm': 9340
+  };
+
   const currentConfig = {
     metal: {
       name: 'Silver',
       purity: '92.5%',
-      basePrice: 48500
+      basePrice: 260
     },
     braceletSize: {
       value: '7” (17.8 cm)',
@@ -192,8 +238,76 @@ document.addEventListener('DOMContentLoaded', () => {
   const priceDisplay = document.getElementById('priceDisplay');
   const specSummaryText = document.getElementById('specSummaryText');
 
+  function parseCleanPrice(val) {
+    if (typeof val === 'number') return Math.round(val);
+    if (!val) return 0;
+    let str = String(val).trim().replace(/,/g, '');
+    const isNegative = str.includes('-');
+    str = str.replace(/[^0-9.]/g, '');
+    const num = parseFloat(str);
+    if (isNaN(num)) return 0;
+    const result = Math.round(num);
+    return isNegative ? -result : result;
+  }
+
   function formatINR(number) {
-    return number.toLocaleString('en-IN');
+    return Math.max(0, Math.round(number)).toLocaleString('en-US');
+  }
+
+  function getCurrentTotalPrice() {
+    let finalPrice = null;
+    const mName = currentConfig.metal.name;
+    const dType = currentConfig.diamond.type;
+    const sVal = currentConfig.size.value;
+    const cName = currentConfig.color.name;
+
+    const possible3WayKeys = [
+      `${mName}::${dType}::${sVal}`,
+      `${cName}::${dType}::${sVal}`,
+      mName === 'Silver' ? `White Gold::${dType}::${sVal}` : '',
+      mName === '9K Gold' ? `Yellow Gold::${dType}::${sVal}` : '',
+      mName === '14K Gold' ? `Rose Gold::${dType}::${sVal}` : '',
+      mName === '18K Gold' ? `Dark Rose Gold::${dType}::${sVal}` : '',
+      cName === 'White' ? `White Gold::${dType}::${sVal}` : '',
+      cName === 'White' ? `Silver::${dType}::${sVal}` : '',
+      cName === 'Light Rose Gold' ? `Rose Gold::${dType}::${sVal}` : '',
+      cName === 'Dark Rose Gold' ? `18K Gold::${dType}::${sVal}` : ''
+    ].filter(Boolean);
+
+    // 1. Check custom overrides from localStorage if present
+    try {
+      const raw = localStorage.getItem('dhouse_product_config');
+      if (raw) {
+        const pConfig = JSON.parse(raw);
+        if (pConfig.variantOverrides) {
+          for (const key of possible3WayKeys) {
+            if (pConfig.variantOverrides[key] !== undefined) {
+              finalPrice = parseCleanPrice(pConfig.variantOverrides[key]);
+              break;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+
+    // 2. Lookup embedded fixed price table
+    if (finalPrice === null) {
+      for (const key of possible3WayKeys) {
+        if (FIXED_VARIANT_PRICES[key] !== undefined) {
+          finalPrice = FIXED_VARIANT_PRICES[key];
+          break;
+        }
+      }
+    }
+
+    // 3. Fallback to basic formula
+    if (finalPrice === null) {
+      finalPrice = currentConfig.metal.basePrice + currentConfig.diamond.addPrice + currentConfig.size.addPrice;
+    }
+
+    return finalPrice;
   }
 
   function renderConfig() {
@@ -214,6 +328,94 @@ document.addEventListener('DOMContentLoaded', () => {
       specSummaryText.innerHTML = `Metal: ${currentConfig.metal.name} (${currentConfig.metal.purity}) &nbsp;|&nbsp; Bracelet Size: ${currentConfig.braceletSize.value} &nbsp;|&nbsp; Color: ${currentConfig.color.name} &nbsp;|&nbsp; Diamond: ${currentConfig.diamond.type} &nbsp;|&nbsp; Diamond Size: ${currentConfig.size.value} &nbsp;|&nbsp; Certificate: ${currentConfig.certificate.code}`;
     }
   }
+
+  // Load Admin-Configured Product Rates & Details
+  function applyAdminProductConfig() {
+    try {
+      const raw = localStorage.getItem('dhouse_product_config');
+      if (!raw) return;
+      const config = JSON.parse(raw);
+
+      // Update Titles
+      if (config.title) {
+        document.querySelectorAll('.product-title').forEach((el) => {
+          el.textContent = config.title;
+        });
+      }
+      if (config.tagline) {
+        document.querySelectorAll('.description-tagline').forEach((el) => {
+          el.textContent = config.tagline;
+        });
+      }
+
+      // Update Metal Cards (base price and purity)
+      if (config.metals) {
+        document.querySelectorAll('#metalSpheresGrid .choice-card').forEach((card) => {
+          const val = card.getAttribute('data-value');
+          if (config.metals[val]) {
+            const m = config.metals[val];
+            if (m.price !== undefined) card.setAttribute('data-price', m.price);
+            if (m.purity) {
+              card.setAttribute('data-purity', m.purity);
+              const detailSpan = card.querySelector('.card-detail span:first-child');
+              if (detailSpan) detailSpan.textContent = m.purity;
+            }
+          }
+        });
+      }
+
+      // Update Diamond Cards (addPrice and subtitle)
+      if (config.diamonds) {
+        document.querySelectorAll('#diamondGrid .choice-card').forEach((card) => {
+          const val = card.getAttribute('data-value');
+          if (config.diamonds[val]) {
+            const d = config.diamonds[val];
+            if (d.addPrice !== undefined) card.setAttribute('data-addprice', d.addPrice);
+            if (d.subtitle) {
+              const subSpan = card.querySelector('.card-detail span:first-child');
+              if (subSpan) subSpan.textContent = d.subtitle;
+            }
+          }
+        });
+      }
+
+      // Update Diamond Size Cards (addPrice)
+      if (config.sizes) {
+        document.querySelectorAll('#sizeGrid .choice-card').forEach((card) => {
+          const val = card.getAttribute('data-value');
+          if (config.sizes[val] && config.sizes[val].addPrice !== undefined) {
+            card.setAttribute('data-addprice', config.sizes[val].addPrice);
+          }
+        });
+      }
+
+      // Synchronize currentConfig with active DOM cards
+      const activeMetalCard = document.querySelector('#metalSpheresGrid .choice-card.active');
+      if (activeMetalCard) {
+        currentConfig.metal.name = activeMetalCard.getAttribute('data-value') || 'Silver';
+        currentConfig.metal.purity = activeMetalCard.getAttribute('data-purity') || '92.5%';
+        currentConfig.metal.basePrice = parseCleanPrice(activeMetalCard.getAttribute('data-price') || '260');
+      }
+
+      const activeDiamondCard = document.querySelector('#diamondGrid .choice-card.active');
+      if (activeDiamondCard) {
+        currentConfig.diamond.type = activeDiamondCard.getAttribute('data-value') || 'Moissanite';
+        currentConfig.diamond.addPrice = parseCleanPrice(activeDiamondCard.getAttribute('data-addprice') || '0');
+      }
+
+      const activeSizeCard = document.querySelector('#sizeGrid .choice-card.active');
+      if (activeSizeCard) {
+        currentConfig.size.value = activeSizeCard.getAttribute('data-value') || '3 mm';
+        currentConfig.size.addPrice = parseCleanPrice(activeSizeCard.getAttribute('data-addprice') || '0');
+      }
+    } catch (e) {
+      console.warn('Error applying admin product configuration:', e);
+    }
+  }
+
+  // Apply admin rates immediately
+  applyAdminProductConfig();
+  renderConfig();
 
   // Generic card group selection helper
   function setupSelectionGroup(containerSelector, onSelect) {
@@ -288,7 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       card.classList.add('active');
       card.setAttribute('aria-selected', 'true');
-      
+
       const colorValue = card.getAttribute('data-value');
       currentConfig.color.name = colorValue;
 
@@ -493,7 +695,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const savedWa = localStorage.getItem('dhouse_whatsapp_number');
       const phoneNumber = (savedWa && savedWa.trim()) ? savedWa.trim().replace(/[^0-9]/g, '') : '919898948986';
       const text = encodeURIComponent(
-        `Hi D'House Jewels! I would like to inquire about the Luster Bracelet:\n- Metal: ${currentConfig.metal.name} (${currentConfig.metal.purity})\n- Bracelet Size: ${currentConfig.braceletSize.value}\n- Color: ${currentConfig.color.name}\n- Diamond: ${currentConfig.diamond.type}\n- Diamond Size: ${currentConfig.size.value}\n- Certificate: ${currentConfig.certificate.code}\n- Price: ₹${priceDisplay ? priceDisplay.textContent : '48,500'}`
+        `Hi D'House Jewels! I would like to inquire about the Luster Bracelet:\n- Metal: ${currentConfig.metal.name} (${currentConfig.metal.purity})\n- Bracelet Size: ${currentConfig.braceletSize.value}\n- Color: ${currentConfig.color.name}\n- Diamond: ${currentConfig.diamond.type}\n- Diamond Size: ${currentConfig.size.value}\n- Certificate: ${currentConfig.certificate.code}\n- Price: $${priceDisplay ? priceDisplay.textContent : '48,500'}`
       );
       window.open(`https://api.whatsapp.com/send?phone=${phoneNumber || '919898948986'}&text=${text}`, '_blank');
     });

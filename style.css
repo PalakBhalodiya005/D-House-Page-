@@ -236,9 +236,11 @@ img {
   font-weight: 500;
   letter-spacing: 1.8px;
   text-decoration: none;
-  line-height: 1.1;
+  line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
 }
 
 .brand-sub {
@@ -257,9 +259,10 @@ img {
 }
 
 .brand-sub .sub-text {
-  font-family: var(--font-script);
-  font-size: 16px;
-  font-weight: 400;
+  font-family: 'XB Niloofar', 'XBnilofar', serif;
+  font-style: italic;
+  font-size: 14.5px;
+  font-weight: normal;
   letter-spacing: 0.5px;
   color: #f7ede4;
   line-height: 1;
@@ -1839,6 +1842,7 @@ img {
   }
 
   .product-features-row {
+    display: grid;
     grid-template-columns: repeat(3, 1fr);
     column-gap: 14px;
     row-gap: 10px;
@@ -1857,6 +1861,7 @@ img {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     text-align: center;
     gap: 6px;
     min-width: 0;
@@ -1885,15 +1890,17 @@ img {
   }
 
   .feature-title {
-    font-size: 11px;
-    line-height: 1.2;
+    font-size: 11.5px;
+    font-weight: 500;
     text-align: center;
+    line-height: 1.25;
   }
 
   .feature-sub {
     font-size: 10px;
-    line-height: 1.2;
+    font-weight: 400;
     text-align: center;
+    line-height: 1.25;
   }
 
   .trust-footer-strip {
@@ -1928,19 +1935,6 @@ img {
     letter-spacing: 0.8px;
   }
 
-  .brand-sub {
-    gap: 4px;
-  }
-
-  .brand-sub .sub-line {
-    width: 12px;
-  }
-
-  .brand-sub .sub-text {
-    font-size: 11.5px;
-    letter-spacing: 0.3px;
-  }
-
   .header-actions {
     gap: 2px;
   }
@@ -1955,6 +1949,7 @@ img {
   }
 
   .product-features-row {
+    display: grid;
     grid-template-columns: repeat(3, 1fr);
     column-gap: 8px;
     row-gap: 6px;
@@ -1969,10 +1964,14 @@ img {
 
   .feature-title {
     font-size: 9.8px;
+    line-height: 1.2;
+    text-align: center;
   }
 
   .feature-sub {
     font-size: 8.8px;
+    line-height: 1.2;
+    text-align: center;
   }
 }
 
