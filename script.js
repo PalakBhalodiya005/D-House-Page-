@@ -153,6 +153,17 @@ document.addEventListener('DOMContentLoaded', () => {
         thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       }
     });
+
+    // Prefetch next video in background for instant next-slide transition
+    const nextIdx = (currentSlideIndex + 1) % totalSlides;
+    const nextVideoSrc = productVideos[nextIdx];
+    if (!document.querySelector(`link[href="${nextVideoSrc}"]`)) {
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.as = 'video';
+      link.href = nextVideoSrc;
+      document.head.appendChild(link);
+    }
   }
 
   // Update gallery images and thumbnails when metal changes
@@ -208,14 +219,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Ensure all thumbnail videos are strictly voice muted & paint initial frame
+  // Ensure all thumbnail videos are strictly muted & paint preview frame
   document.querySelectorAll('.thumb-video').forEach((v) => {
     v.muted = true;
     v.defaultMuted = true;
     v.volume = 0;
-    v.addEventListener('loadedmetadata', () => {
-      v.currentTime = 0.1;
-    });
+    const paintFrame = () => {
+      try {
+        v.currentTime = 0.1;
+      } catch (err) {}
+    };
+    if (v.readyState >= 1) {
+      paintFrame();
+    } else {
+      v.addEventListener('loadedmetadata', paintFrame, { once: true });
+    }
   });
 
   // Main video click to pause/play (always strictly muted)
