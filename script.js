@@ -65,15 +65,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---------------------------------------------------------------------------
   // Product Showcase Videos (M1.mp4 to M8.mp4) - Voice Muted
   // ---------------------------------------------------------------------------
+  const CDN_BASE = 'https://palakbhalodiya005.github.io/d-house-video';
+
   const productVideos = [
-    'images/M1.mp4',
-    'images/M2.mp4',
-    'images/M3.mp4',
-    'images/M4.mp4',
-    'images/M5.mp4',
-    'images/M6.mp4',
-    'images/M7.mp4',
-    'images/M8.mp4'
+    `${CDN_BASE}/M1.mp4`,
+    `${CDN_BASE}/M2.mp4`,
+    `${CDN_BASE}/M3.mp4`,
+    `${CDN_BASE}/M4.mp4`,
+    `${CDN_BASE}/M5.mp4`,
+    `${CDN_BASE}/M6.mp4`,
+    `${CDN_BASE}/M7.mp4`,
+    `${CDN_BASE}/M8.mp4`
   ];
 
   let currentMetal = 'Silver';
