@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 3. Customizer State & Dynamic Pricing
   // ---------------------------------------------------------------------------
   const FIXED_VARIANT_PRICES = {
-    // Silver
+    // Silver / White Gold / White
     'Silver::Moissanite::2 mm': 260,
     'Silver::Moissanite::3 mm': 270,
     'Silver::Moissanite::4 mm': 280,
@@ -265,8 +265,26 @@ document.addEventListener('DOMContentLoaded', () => {
     'Silver::Natural::2 mm': 6680,
     'Silver::Natural::3 mm': 6980,
     'Silver::Natural::4 mm': 7280,
+    'White Gold::Moissanite::2 mm': 260,
+    'White Gold::Moissanite::3 mm': 270,
+    'White Gold::Moissanite::4 mm': 280,
+    'White Gold::CVD::2 mm': 1380,
+    'White Gold::CVD::3 mm': 1480,
+    'White Gold::CVD::4 mm': 1580,
+    'White Gold::Natural::2 mm': 6680,
+    'White Gold::Natural::3 mm': 6980,
+    'White Gold::Natural::4 mm': 7280,
+    'White::Moissanite::2 mm': 260,
+    'White::Moissanite::3 mm': 270,
+    'White::Moissanite::4 mm': 280,
+    'White::CVD::2 mm': 1380,
+    'White::CVD::3 mm': 1480,
+    'White::CVD::4 mm': 1580,
+    'White::Natural::2 mm': 6680,
+    'White::Natural::3 mm': 6980,
+    'White::Natural::4 mm': 7280,
 
-    // 9K Gold
+    // 9K Gold / Yellow Gold (Admin Panel Variations)
     '9K Gold::Moissanite::2 mm': 1150,
     '9K Gold::Moissanite::3 mm': 1160,
     '9K Gold::Moissanite::4 mm': 1170,
@@ -276,8 +294,17 @@ document.addEventListener('DOMContentLoaded', () => {
     '9K Gold::Natural::2 mm': 7840,
     '9K Gold::Natural::3 mm': 8140,
     '9K Gold::Natural::4 mm': 8440,
+    'Yellow Gold::Moissanite::2 mm': 1150,
+    'Yellow Gold::Moissanite::3 mm': 1160,
+    'Yellow Gold::Moissanite::4 mm': 1170,
+    'Yellow Gold::CVD::2 mm': 2270,
+    'Yellow Gold::CVD::3 mm': 2370,
+    'Yellow Gold::CVD::4 mm': 2470,
+    'Yellow Gold::Natural::2 mm': 7840,
+    'Yellow Gold::Natural::3 mm': 8140,
+    'Yellow Gold::Natural::4 mm': 8440,
 
-    // 14K Gold
+    // 14K Gold / Rose Gold / Light Rose Gold
     '14K Gold::Moissanite::2 mm': 1650,
     '14K Gold::Moissanite::3 mm': 1660,
     '14K Gold::Moissanite::4 mm': 1670,
@@ -287,8 +314,26 @@ document.addEventListener('DOMContentLoaded', () => {
     '14K Gold::Natural::2 mm': 8340,
     '14K Gold::Natural::3 mm': 8640,
     '14K Gold::Natural::4 mm': 8940,
+    'Rose Gold::Moissanite::2 mm': 1650,
+    'Rose Gold::Moissanite::3 mm': 1660,
+    'Rose Gold::Moissanite::4 mm': 1670,
+    'Rose Gold::CVD::2 mm': 2770,
+    'Rose Gold::CVD::3 mm': 2870,
+    'Rose Gold::CVD::4 mm': 2970,
+    'Rose Gold::Natural::2 mm': 8340,
+    'Rose Gold::Natural::3 mm': 8640,
+    'Rose Gold::Natural::4 mm': 8940,
+    'Light Rose Gold::Moissanite::2 mm': 1650,
+    'Light Rose Gold::Moissanite::3 mm': 1660,
+    'Light Rose Gold::Moissanite::4 mm': 1670,
+    'Light Rose Gold::CVD::2 mm': 2770,
+    'Light Rose Gold::CVD::3 mm': 2870,
+    'Light Rose Gold::CVD::4 mm': 2970,
+    'Light Rose Gold::Natural::2 mm': 8340,
+    'Light Rose Gold::Natural::3 mm': 8640,
+    'Light Rose Gold::Natural::4 mm': 8940,
 
-    // 18K Gold
+    // 18K Gold / Dark Rose Gold
     '18K Gold::Moissanite::2 mm': 2050,
     '18K Gold::Moissanite::3 mm': 2060,
     '18K Gold::Moissanite::4 mm': 2070,
@@ -297,7 +342,16 @@ document.addEventListener('DOMContentLoaded', () => {
     '18K Gold::CVD::4 mm': 3370,
     '18K Gold::Natural::2 mm': 8740,
     '18K Gold::Natural::3 mm': 9040,
-    '18K Gold::Natural::4 mm': 9340
+    '18K Gold::Natural::4 mm': 9340,
+    'Dark Rose Gold::Moissanite::2 mm': 2050,
+    'Dark Rose Gold::Moissanite::3 mm': 2060,
+    'Dark Rose Gold::Moissanite::4 mm': 2070,
+    'Dark Rose Gold::CVD::2 mm': 3170,
+    'Dark Rose Gold::CVD::3 mm': 3270,
+    'Dark Rose Gold::CVD::4 mm': 3370,
+    'Dark Rose Gold::Natural::2 mm': 8740,
+    'Dark Rose Gold::Natural::3 mm': 9040,
+    'Dark Rose Gold::Natural::4 mm': 9340
   };
 
   const currentConfig = {
@@ -346,6 +400,79 @@ document.addEventListener('DOMContentLoaded', () => {
     return Math.max(0, Math.round(number)).toLocaleString('en-US');
   }
 
+  function isCorruptedStalePrice(key, price) {
+    if (!price || price <= 0) return true;
+    const num = Number(price);
+    // 9K Gold variants: Moissanite is 1150+, CVD is 2270+, Natural is 7840+
+    if (key.includes('9K Gold') || key.includes('Yellow Gold')) {
+      if (key.includes('Moissanite') && num < 1100) return true;
+      if (key.includes('CVD') && num < 2200) return true;
+      if (key.includes('Natural') && num < 7800) return true;
+    }
+    // Silver variants: CVD >= 1300, Natural >= 6500
+    if (key.includes('Silver') || key.includes('White')) {
+      if (key.includes('CVD') && num < 1300) return true;
+      if (key.includes('Natural') && num < 6500) return true;
+    }
+    // 14K Gold variants: Moissanite >= 1600, CVD >= 2700, Natural >= 8300
+    if (key.includes('14K Gold') || key.includes('Rose Gold')) {
+      if (key.includes('Moissanite') && num < 1600) return true;
+      if (key.includes('CVD') && num < 2700) return true;
+      if (key.includes('Natural') && num < 8300) return true;
+    }
+    // 18K Gold variants: Moissanite >= 2000, CVD >= 3100, Natural >= 8700
+    if (key.includes('18K Gold') || key.includes('Dark Rose Gold')) {
+      if (key.includes('Moissanite') && num < 2000) return true;
+      if (key.includes('CVD') && num < 3100) return true;
+      if (key.includes('Natural') && num < 8700) return true;
+    }
+    return false;
+  }
+
+  function sanitizeLocalStoragePricing() {
+    try {
+      const raw = localStorage.getItem('dhouse_product_config');
+      if (raw) {
+        const pConfig = JSON.parse(raw);
+        let changed = false;
+        if (pConfig.variantOverrides) {
+          for (const key in FIXED_VARIANT_PRICES) {
+            const currentVal = pConfig.variantOverrides[key];
+            if (currentVal === undefined || isCorruptedStalePrice(key, currentVal)) {
+              pConfig.variantOverrides[key] = FIXED_VARIANT_PRICES[key];
+              changed = true;
+            }
+          }
+        } else {
+          pConfig.variantOverrides = Object.assign({}, FIXED_VARIANT_PRICES);
+          changed = true;
+        }
+        if (changed) {
+          localStorage.setItem('dhouse_product_config', JSON.stringify(pConfig));
+          localStorage.setItem('dhouse_variant_prices', JSON.stringify(pConfig.variantOverrides));
+        }
+      }
+
+      const rawVar = localStorage.getItem('dhouse_variant_prices');
+      if (rawVar) {
+        const varPrices = JSON.parse(rawVar);
+        let changedVar = false;
+        for (const key in FIXED_VARIANT_PRICES) {
+          const currentVal = varPrices[key];
+          if (currentVal === undefined || isCorruptedStalePrice(key, currentVal)) {
+            varPrices[key] = FIXED_VARIANT_PRICES[key];
+            changedVar = true;
+          }
+        }
+        if (changedVar) {
+          localStorage.setItem('dhouse_variant_prices', JSON.stringify(varPrices));
+        }
+      }
+    } catch (e) {
+      console.warn('Error sanitizing local storage pricing:', e);
+    }
+  }
+
   function getCurrentTotalPrice() {
     let finalPrice = null;
     const mName = currentConfig.metal.name;
@@ -357,12 +484,16 @@ document.addEventListener('DOMContentLoaded', () => {
       `${mName}::${dType}::${sVal}`,
       `${cName}::${dType}::${sVal}`,
       mName === 'Silver' ? `White Gold::${dType}::${sVal}` : '',
+      mName === 'Silver' ? `White::${dType}::${sVal}` : '',
       mName === '9K Gold' ? `Yellow Gold::${dType}::${sVal}` : '',
       mName === '14K Gold' ? `Rose Gold::${dType}::${sVal}` : '',
+      mName === '14K Gold' ? `Light Rose Gold::${dType}::${sVal}` : '',
       mName === '18K Gold' ? `Dark Rose Gold::${dType}::${sVal}` : '',
-      cName === 'White' ? `White Gold::${dType}::${sVal}` : '',
       cName === 'White' ? `Silver::${dType}::${sVal}` : '',
-      cName === 'Light Rose Gold' ? `Rose Gold::${dType}::${sVal}` : '',
+      cName === 'White' ? `White Gold::${dType}::${sVal}` : '',
+      cName === 'Yellow Gold' ? `9K Gold::${dType}::${sVal}` : '',
+      cName === 'Rose Gold' ? `14K Gold::${dType}::${sVal}` : '',
+      cName === 'Light Rose Gold' ? `14K Gold::${dType}::${sVal}` : '',
       cName === 'Dark Rose Gold' ? `18K Gold::${dType}::${sVal}` : ''
     ].filter(Boolean);
 
@@ -371,20 +502,41 @@ document.addEventListener('DOMContentLoaded', () => {
       const raw = localStorage.getItem('dhouse_product_config');
       if (raw) {
         const pConfig = JSON.parse(raw);
-        if (pConfig.variantOverrides) {
+        if (pConfig.metals && pConfig.metals.Silver && pConfig.metals.Silver.price > 5000) {
+          localStorage.removeItem('dhouse_product_config');
+          localStorage.removeItem('dhouse_variant_prices');
+        } else if (pConfig.variantOverrides) {
           for (const key of possible3WayKeys) {
-            if (pConfig.variantOverrides[key] !== undefined) {
-              finalPrice = parseCleanPrice(pConfig.variantOverrides[key]);
-              break;
+            if (pConfig.variantOverrides[key] !== undefined && pConfig.variantOverrides[key] !== null) {
+              const parsed = parseCleanPrice(pConfig.variantOverrides[key]);
+              if (parsed > 0 && !isCorruptedStalePrice(key, parsed)) {
+                finalPrice = parsed;
+                break;
+              }
+            }
+          }
+        }
+      }
+      if (finalPrice === null) {
+        const rawVar = localStorage.getItem('dhouse_variant_prices');
+        if (rawVar) {
+          const varPrices = JSON.parse(rawVar);
+          for (const key of possible3WayKeys) {
+            if (varPrices[key] !== undefined && varPrices[key] !== null) {
+              const parsed = parseCleanPrice(varPrices[key]);
+              if (parsed > 0 && !isCorruptedStalePrice(key, parsed)) {
+                finalPrice = parsed;
+                break;
+              }
             }
           }
         }
       }
     } catch (e) {
-      console.warn(e);
+      console.warn('Error reading variant overrides from localStorage:', e);
     }
 
-    // 2. Lookup embedded fixed price table
+    // 2. Lookup embedded fixed price table (exact match from Admin Panel)
     if (finalPrice === null) {
       for (const key of possible3WayKeys) {
         if (FIXED_VARIANT_PRICES[key] !== undefined) {
@@ -394,20 +546,17 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // 3. Fallback to basic formula
+    // 3. Fallback to basic formula if custom variant not in matrix
     if (finalPrice === null) {
-      finalPrice = currentConfig.metal.basePrice + currentConfig.diamond.addPrice + currentConfig.size.addPrice;
+      finalPrice = (currentConfig.metal.basePrice || 260) + (currentConfig.diamond.addPrice || 0) + (currentConfig.size.addPrice || 0);
     }
 
+    // No price variation for Available Sizes (bracelet length) - size changes do not affect price
     return finalPrice;
   }
 
   function renderConfig() {
-    const totalPrice =
-      currentConfig.metal.basePrice +
-      (currentConfig.braceletSize.addPrice || 0) +
-      currentConfig.diamond.addPrice +
-      currentConfig.size.addPrice;
+    const totalPrice = getCurrentTotalPrice();
 
     if (priceDisplay) {
       priceDisplay.textContent = formatINR(totalPrice);
@@ -505,9 +654,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Apply admin rates immediately
+  // Sanitize and apply admin rates immediately
+  sanitizeLocalStoragePricing();
   applyAdminProductConfig();
   renderConfig();
+
+  // Real-time synchronization when variation prices are saved in Admin Panel
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'dhouse_product_config' || e.key === 'dhouse_variant_prices') {
+      sanitizeLocalStoragePricing();
+      applyAdminProductConfig();
+      renderConfig();
+    }
+  });
 
   // Generic card group selection helper
   function setupSelectionGroup(containerSelector, onSelect) {
@@ -643,15 +802,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const val = item.getAttribute('data-value');
         const size = item.getAttribute('data-size');
-        const addPrice = parseInt(item.getAttribute('data-addprice'), 10) || 0;
 
         // Update trigger UI
         if (triggerSizeBadge) triggerSizeBadge.textContent = size;
         if (triggerSelectedText) triggerSelectedText.textContent = val;
 
-        // Update config state with size and dynamic price addition
+        // Update config state with size (no price variation for bracelet size)
         currentConfig.braceletSize.value = val;
-        currentConfig.braceletSize.addPrice = addPrice;
+        currentConfig.braceletSize.addPrice = 0;
 
         // Close dropdown
         braceletSizeDropdown.classList.remove('open');
@@ -704,11 +862,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Helper to save current configuration & directly open checkout page
   function saveAndDirectCheckout() {
-    const totalPrice =
-      currentConfig.metal.basePrice +
-      (currentConfig.braceletSize.addPrice || 0) +
-      currentConfig.diamond.addPrice +
-      currentConfig.size.addPrice;
+    const totalPrice = getCurrentTotalPrice();
 
     const selectedImg = metalConfigThumbs[currentMetal] || 'images/circle_silver.jpg';
 

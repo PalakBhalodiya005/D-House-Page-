@@ -228,6 +228,15 @@ document.addEventListener('DOMContentLoaded', () => {
     '9K Gold::Natural::2 mm': 7840,
     '9K Gold::Natural::3 mm': 8140,
     '9K Gold::Natural::4 mm': 8440,
+    'Yellow Gold::Moissanite::2 mm': 1150,
+    'Yellow Gold::Moissanite::3 mm': 1160,
+    'Yellow Gold::Moissanite::4 mm': 1170,
+    'Yellow Gold::CVD::2 mm': 2270,
+    'Yellow Gold::CVD::3 mm': 2370,
+    'Yellow Gold::CVD::4 mm': 2470,
+    'Yellow Gold::Natural::2 mm': 7840,
+    'Yellow Gold::Natural::3 mm': 8140,
+    'Yellow Gold::Natural::4 mm': 8440,
 
     // 14K Gold
     '14K Gold::Moissanite::2 mm': 1650,
@@ -239,6 +248,24 @@ document.addEventListener('DOMContentLoaded', () => {
     '14K Gold::Natural::2 mm': 8340,
     '14K Gold::Natural::3 mm': 8640,
     '14K Gold::Natural::4 mm': 8940,
+    'Rose Gold::Moissanite::2 mm': 1650,
+    'Rose Gold::Moissanite::3 mm': 1660,
+    'Rose Gold::Moissanite::4 mm': 1670,
+    'Rose Gold::CVD::2 mm': 2770,
+    'Rose Gold::CVD::3 mm': 2870,
+    'Rose Gold::CVD::4 mm': 2970,
+    'Rose Gold::Natural::2 mm': 8340,
+    'Rose Gold::Natural::3 mm': 8640,
+    'Rose Gold::Natural::4 mm': 8940,
+    'Light Rose Gold::Moissanite::2 mm': 1650,
+    'Light Rose Gold::Moissanite::3 mm': 1660,
+    'Light Rose Gold::Moissanite::4 mm': 1670,
+    'Light Rose Gold::CVD::2 mm': 2770,
+    'Light Rose Gold::CVD::3 mm': 2870,
+    'Light Rose Gold::CVD::4 mm': 2970,
+    'Light Rose Gold::Natural::2 mm': 8340,
+    'Light Rose Gold::Natural::3 mm': 8640,
+    'Light Rose Gold::Natural::4 mm': 8940,
 
     // 18K Gold
     '18K Gold::Moissanite::2 mm': 2050,
@@ -249,7 +276,16 @@ document.addEventListener('DOMContentLoaded', () => {
     '18K Gold::CVD::4 mm': 3370,
     '18K Gold::Natural::2 mm': 8740,
     '18K Gold::Natural::3 mm': 9040,
-    '18K Gold::Natural::4 mm': 9340
+    '18K Gold::Natural::4 mm': 9340,
+    'Dark Rose Gold::Moissanite::2 mm': 2050,
+    'Dark Rose Gold::Moissanite::3 mm': 2060,
+    'Dark Rose Gold::Moissanite::4 mm': 2070,
+    'Dark Rose Gold::CVD::2 mm': 3170,
+    'Dark Rose Gold::CVD::3 mm': 3270,
+    'Dark Rose Gold::CVD::4 mm': 3370,
+    'Dark Rose Gold::Natural::2 mm': 8740,
+    'Dark Rose Gold::Natural::3 mm': 9040,
+    'Dark Rose Gold::Natural::4 mm': 9340
   };
 
   const defaultProductConfig = {
@@ -303,7 +339,16 @@ document.addEventListener('DOMContentLoaded', () => {
           localStorage.removeItem('dhouse_variant_prices');
           return JSON.parse(JSON.stringify(defaultProductConfig));
         }
-        parsed.variantOverrides = Object.assign({}, FIXED_VARIANT_PRICES, parsed.variantOverrides || {});
+        const overrides = parsed.variantOverrides || {};
+        const isStale9K = !overrides['9K Gold::Moissanite::2 mm'] || Number(overrides['9K Gold::Moissanite::2 mm']) < 1000;
+        const isStale14K = !overrides['14K Gold::Moissanite::2 mm'] || Number(overrides['14K Gold::Moissanite::2 mm']) < 1600;
+        const isStale18K = !overrides['18K Gold::Moissanite::2 mm'] || Number(overrides['18K Gold::Moissanite::2 mm']) < 2000;
+        const isStaleSilverCVD = !overrides['Silver::CVD::2 mm'] || Number(overrides['Silver::CVD::2 mm']) < 1000;
+        if (isStale9K || isStale14K || isStale18K || isStaleSilverCVD) {
+          parsed.variantOverrides = Object.assign({}, overrides, FIXED_VARIANT_PRICES);
+        } else {
+          parsed.variantOverrides = Object.assign({}, FIXED_VARIANT_PRICES, overrides);
+        }
         return Object.assign({}, defaultProductConfig, parsed);
       }
     } catch (e) {
@@ -741,7 +786,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Master Group Price edit (when grouped by metal) -> automatically update sub-variant inputs
+    // Master Group Price edit (when grouped by metal)
     document.querySelectorAll('.master-group-price').forEach((input) => {
       input.addEventListener('change', () => {
         const mKey = input.getAttribute('data-metal-key');
@@ -751,20 +796,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentProductConfig.metals && currentProductConfig.metals[mKey]) {
           currentProductConfig.metals[mKey].price = newBase;
         }
-
-        // Update child sub-inputs
-        const childInputs = document.querySelectorAll(`.sub-variant-price[data-metal-key="${mKey}"]`);
-        childInputs.forEach((subInput) => {
-          const dKey = subInput.getAttribute('data-diamond-key');
-          const sKey = subInput.getAttribute('data-size-key');
-          const dAdd = currentProductConfig.diamonds?.[dKey]?.addPrice ?? 0;
-          const sAdd = currentProductConfig.sizes?.[sKey]?.addPrice ?? 0;
-          const calculatedPrice = newBase + dAdd + sAdd;
-          subInput.value = formatPriceValue(calculatedPrice);
-          const overrideKey = `${mKey}::${dKey}::${sKey}`;
-          if (!currentProductConfig.variantOverrides) currentProductConfig.variantOverrides = {};
-          currentProductConfig.variantOverrides[overrideKey] = calculatedPrice;
-        });
       });
     });
 
@@ -879,6 +910,15 @@ document.addEventListener('DOMContentLoaded', () => {
       '14K Gold': ['Rose Gold', 'Light Rose Gold'],
       '18K Gold': ['Dark Rose Gold', '18K Gold']
     };
+
+    // Harvest master group prices (e.g. 480 for 9K Gold)
+    document.querySelectorAll('.master-group-price').forEach((input) => {
+      const mKey = input.getAttribute('data-metal-key');
+      const val = parseCleanNumber(input.value);
+      if (mKey && currentProductConfig.metals && currentProductConfig.metals[mKey]) {
+        currentProductConfig.metals[mKey].price = val;
+      }
+    });
 
     // Harvest sub-variant inputs
     document.querySelectorAll('.sub-variant-price').forEach((input) => {
